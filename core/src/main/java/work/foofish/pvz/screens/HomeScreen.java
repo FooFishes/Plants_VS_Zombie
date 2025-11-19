@@ -1,0 +1,100 @@
+package work.foofish.pvz.screens;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import work.foofish.pvz.PvzGame;
+
+public class HomeScreen implements Screen {
+    private final PvzGame game;
+    private final Stage stage;
+    private final TextureAtlas atlas;
+    private final Skin skin;
+
+    public HomeScreen (PvzGame game) {
+        this.game = game;
+        this.stage = new Stage(new FitViewport(900, 600), game.batch);
+        this.atlas = game.getAssets().getAtlas("atlases/ui.atlas");
+        this.skin = new Skin();
+        this.skin.addRegions(atlas);
+        buildUI();
+    }
+
+    private void buildUI () {
+        TextureRegion bgRegion = atlas.findRegion("MainMenu");
+        Image background = new Image(bgRegion);
+        background.setFillParent(true);
+        stage.addActor(background);
+
+        Button.ButtonStyle btnStyle = new Button.ButtonStyle();
+        btnStyle.up = skin.newDrawable("adventure_up");
+        btnStyle.down = skin.newDrawable("adventure_down");
+        skin.add("adventure_button", btnStyle);
+
+        Table table = new Table();
+        table.setFillParent(true);
+        table.setDebug(true);
+
+        Button adventure = new Button(skin, "adventure_button");
+        adventure.addListener(new ChangeListener() {
+            @Override
+            public void changed (ChangeEvent event, Actor actor) {
+                game.setScreen(new GameScreen(game));
+            }
+        });
+
+        table.add(adventure).width(360).height(150).pad(70, 0, 0, 75);
+        table.align(Align.topRight);
+        stage.addActor(table);
+        table.toFront();
+    }
+
+    @Override
+    public void show () {
+        Gdx.input.setInputProcessor(stage);
+    }
+
+    @Override
+    public void render (float delta) {
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        stage.act(delta);
+        stage.draw();
+    }
+
+    @Override
+    public void resize (int width, int height) {
+        stage.getViewport().update(width, height, true);
+    }
+
+    @Override
+    public void pause () {
+
+    }
+
+    @Override
+    public void resume () {
+
+    }
+
+    @Override
+    public void hide () {
+
+    }
+
+    @Override
+    public void dispose () {
+        stage.dispose();
+        skin.dispose();
+    }
+}

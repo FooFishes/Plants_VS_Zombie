@@ -18,7 +18,7 @@ public class PvzGame extends Game {
         setScreen(new LoadingScreen(this));
     }
 
-    public AssetService getAssetService() {
+    public AssetService getAssets () {
         return assetService;
     }
 

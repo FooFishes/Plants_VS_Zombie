@@ -1,0 +1,17 @@
+ui.png
+size:2048,1024
+repeat:none
+ChooserBackground
+bounds:2,78,522,87
+MainMenu
+bounds:2,167,900,600
+ZombiesWon
+bounds:904,328,498,439
+adventure_down
+bounds:1404,697,165,70
+adventure_up
+bounds:904,256,166,70
+car
+bounds:526,108,71,57
+shovel
+bounds:2,2,70,74

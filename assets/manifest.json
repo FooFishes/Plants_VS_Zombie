@@ -1,5 +1,7 @@
 {
   "atlases": [
-    "atlases/Plants.atlas"
+    "atlases/Plants.atlas",
+    "atlases/ui.atlas"
+    "atlases/map.atlas"
   ]
 }
