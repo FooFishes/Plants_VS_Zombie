@@ -17,6 +17,12 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import work.foofish.pvz.AssetService;
 import work.foofish.pvz.PvzGame;
+import work.foofish.pvz.entities.Sun;
+import work.foofish.pvz.entities.plants.BasePlant;
+import work.foofish.pvz.entities.plants.Sunflower;
+import work.foofish.pvz.utils.AssetPaths;
+
+import java.util.List;
 
 public class GameScreen implements Screen, InputProcessor {
     private static final float MAP_WIDTH = 1400f;
@@ -26,14 +32,28 @@ public class GameScreen implements Screen, InputProcessor {
     private static final float INTRO_DURATION = 1.75f;
     private static final float OUTRO_DURATION = 1.25f;
 
+    // Grid configuration
+    private static final float CELL_WIDTH = 80f;
+    private static final float CELL_HEIGHT = 96f;
+    private static final float GRID_OFFSET_X = 260f; // Distance from Map Left to Grid Left
+    private static final float GRID_OFFSET_Y = 85f;  // Distance from Map Top to Grid Top
+
     private final PvzGame game;
     private final AssetService assets;
+
+    public AssetService getAssets() {
+        return assets;
+    }
     private final OrthographicCamera worldCamera = new OrthographicCamera();
     private final FitViewport worldViewport = new FitViewport(VIEW_WIDTH, VIEW_HEIGHT, worldCamera);
     private final Stage uiStage;
     private final TextureAtlas uiAtlas;
     private final TextureRegion mapBackground;
     private final Rectangle[][] grid = new Rectangle[5][9];
+    private final com.badlogic.gdx.graphics.glutils.ShapeRenderer shapeRenderer;
+
+    private final List<BasePlant> plants = new java.util.ArrayList<>();
+    private final List<Sun> suns = new java.util.ArrayList<>();
 
     private InputMultiplexer inputMultiplexer;
 
@@ -50,17 +70,30 @@ public class GameScreen implements Screen, InputProcessor {
         this.game = game;
         this.assets = game.getAssets();
         this.uiStage = new Stage(new ScreenViewport());
+        this.shapeRenderer = new com.badlogic.gdx.graphics.glutils.ShapeRenderer();
 
-        // 使用 ui.atlas 中的一张图做地图背景占位
-        this.uiAtlas = this.assets.getAtlas("atlases/map.atlas");
+        this.uiAtlas = this.assets.getAtlas(AssetPaths.MAP_ATLAS);
         TextureRegion bgRegion = null;
         if (uiAtlas != null) {
-            bgRegion = uiAtlas.findRegion("simple_day");
+            bgRegion = uiAtlas.findRegion(AssetPaths.REGION_SIMPLE_DAY);
         }
         this.mapBackground = bgRegion;
 
         initGrid();
+        for (int i = 0; i < 5; i++) {
+            // Add default Sunflower
+            addPlant(new Sunflower(this, grid[i][i].x, grid[i][i].y));
+        }
+
         snapCameraTo(currentAnchor);
+    }
+
+    public void addPlant(BasePlant plant) {
+        plants.add(plant);
+    }
+
+    public void addSun(Sun sun) {
+        suns.add(sun);
     }
 
     @Override
@@ -86,9 +119,39 @@ public class GameScreen implements Screen, InputProcessor {
             batch.draw(mapBackground, 0f, 0f, MAP_WIDTH, MAP_HEIGHT);
         }
 
-        // TODO: 在此处绘制地图网格、植物、僵尸等世界元素（使用 grid）
+        // Update and draw plants
+        for (int i = plants.size() - 1; i >= 0; i--) {
+            BasePlant plant = plants.get(i);
+            plant.update(delta);
+            plant.draw(batch);
+            if (!plant.isAlive()) {
+                plants.remove(i);
+            }
+        }
+
+        // Update and draw suns
+        for (int i = suns.size() - 1; i >= 0; i--) {
+            Sun sun = suns.get(i);
+            sun.update(delta);
+            sun.draw(batch);
+            if (!sun.isActive()) {
+                suns.remove(i);
+            }
+        }
 
         batch.end();
+
+        // Draw grid borders
+        shapeRenderer.setProjectionMatrix(worldCamera.combined);
+        shapeRenderer.begin(com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(1, 0, 0, 1); // Red color
+        for (int row = 0; row < 5; row++) {
+            for (int col = 0; col < 9; col++) {
+                Rectangle rect = grid[row][col];
+                shapeRenderer.rect(rect.x, rect.y, rect.width, rect.height);
+            }
+        }
+        shapeRenderer.end();
 
         uiStage.act(delta);
         uiStage.draw();
@@ -118,6 +181,7 @@ public class GameScreen implements Screen, InputProcessor {
     @Override
     public void dispose () {
         uiStage.dispose();
+        shapeRenderer.dispose();
     }
 
     public void beginIntroSlide () {
@@ -178,16 +242,14 @@ public class GameScreen implements Screen, InputProcessor {
      * 这里使用简单的占位布局，后续可以根据实际美术调整。
      */
     private void initGrid () {
-        float cellWidth = 80f;
-        float cellHeight = 100f;
-        float startX = 200f;
-        float startY = 50f;
-
         for (int row = 0; row < 5; row++) {
             for (int col = 0; col < 9; col++) {
-                float x = startX + col * cellWidth;
-                float y = startY + row * cellHeight;
-                grid[row][col] = new Rectangle(x, y, cellWidth, cellHeight);
+                float x = GRID_OFFSET_X + col * CELL_WIDTH;
+                // Calculate y relative to top-left:
+                // Map Height - Top Offset - (Row Index + 1) * Cell Height
+                // This makes grid[0][0] the top-left cell
+                float y = MAP_HEIGHT - GRID_OFFSET_Y - (row + 1) * CELL_HEIGHT;
+                grid[row][col] = new Rectangle(x, y, CELL_WIDTH, CELL_HEIGHT);
             }
         }
     }

@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import work.foofish.pvz.PvzGame;
+import work.foofish.pvz.utils.AssetPaths;
 
 public class HomeScreen implements Screen {
     private final PvzGame game;
@@ -25,14 +26,14 @@ public class HomeScreen implements Screen {
     public HomeScreen (PvzGame game) {
         this.game = game;
         this.stage = new Stage(new FitViewport(900, 600), game.batch);
-        this.atlas = game.getAssets().getAtlas("atlases/ui.atlas");
+        this.atlas = game.getAssets().getAtlas(AssetPaths.UI_ATLAS);
         this.skin = new Skin();
         this.skin.addRegions(atlas);
         buildUI();
     }
 
     private void buildUI () {
-        TextureRegion bgRegion = atlas.findRegion("MainMenu");
+        TextureRegion bgRegion = atlas.findRegion(AssetPaths.REGION_MAIN_MENU);
         Image background = new Image(bgRegion);
         background.setFillParent(true);
         stage.addActor(background);
