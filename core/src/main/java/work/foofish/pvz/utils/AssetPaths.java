@@ -1,13 +1,13 @@
 package work.foofish.pvz.utils;
 
 public class AssetPaths {
-    // Atlases
+    // 图集
     public static final String MAP_ATLAS = "atlases/maps.atlas";
     public static final String PLANTS_ATLAS = "atlases/plants.atlas";
     public static final String ZOMBIES_ATLAS = "atlases/zombies.atlas";
     public static final String UI_ATLAS = "atlases/ui.atlas";
 
-    // Atlas Region Names
+    // 图集区域名称
     public static final String REGION_SIMPLE_DAY = "simple_day";
     public static final String REGION_MAIN_MENU = "MainMenu";
     public static final String REGION_SUNFLOWER_NORMAL = "sunflower_normal";
@@ -16,16 +16,16 @@ public class AssetPaths {
 
     public static final String REGION_SUN = "sun";
 
-    // Fonts
-    // Add font paths here if needed
+    // 字体
+    // 如需要，在此添加字体路径
 
-    // Music
-    // Add music paths here if needed
+    // 音乐
+    // 如需要，在此添加音乐路径
 
-    // Sounds
-    // Add sound paths here if needed
+    // 音效
+    // 如需要，在此添加音效路径
 
     private AssetPaths() {
-        // Private constructor to prevent instantiation
+        // 私有构造函数，防止实例化
     }
 }

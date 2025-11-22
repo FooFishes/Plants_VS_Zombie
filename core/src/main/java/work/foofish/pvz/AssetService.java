@@ -22,7 +22,7 @@ public final class AssetService {
     private AssetService () {
         manager = new AssetManager();
         Texture.setAssetManager(manager);
-        // 加载 FreeType 字体
+        // 加载 FreeType 字体支持
         FileHandleResolver resolver = new InternalFileHandleResolver();
         manager.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
         manager.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(resolver));

@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -22,6 +23,7 @@ import work.foofish.pvz.entities.plants.BasePlant;
 import work.foofish.pvz.entities.plants.Sunflower;
 import work.foofish.pvz.utils.AssetPaths;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GameScreen implements Screen, InputProcessor {
@@ -32,11 +34,11 @@ public class GameScreen implements Screen, InputProcessor {
     private static final float INTRO_DURATION = 1.75f;
     private static final float OUTRO_DURATION = 1.25f;
 
-    // Grid configuration
+    // 网格配置
     private static final float CELL_WIDTH = 80f;
-    private static final float CELL_HEIGHT = 96f;
-    private static final float GRID_OFFSET_X = 260f; // Distance from Map Left to Grid Left
-    private static final float GRID_OFFSET_Y = 85f;  // Distance from Map Top to Grid Top
+    private static final float CELL_HEIGHT = 95f;
+    private static final float GRID_OFFSET_X = 260f; // 从地图左侧到网格左侧的距离
+    private static final float GRID_OFFSET_Y = 85f;  // 从地图顶部到网格顶部的距离
 
     private final PvzGame game;
     private final AssetService assets;
@@ -50,10 +52,10 @@ public class GameScreen implements Screen, InputProcessor {
     private final TextureAtlas uiAtlas;
     private final TextureRegion mapBackground;
     private final Rectangle[][] grid = new Rectangle[5][9];
-    private final com.badlogic.gdx.graphics.glutils.ShapeRenderer shapeRenderer;
+    private final ShapeRenderer shapeRenderer;
 
-    private final List<BasePlant> plants = new java.util.ArrayList<>();
-    private final List<Sun> suns = new java.util.ArrayList<>();
+    private final List<BasePlant> plants = new ArrayList<>();
+    private final List<Sun> suns = new ArrayList<>();
 
     private InputMultiplexer inputMultiplexer;
 
@@ -70,7 +72,7 @@ public class GameScreen implements Screen, InputProcessor {
         this.game = game;
         this.assets = game.getAssets();
         this.uiStage = new Stage(new ScreenViewport());
-        this.shapeRenderer = new com.badlogic.gdx.graphics.glutils.ShapeRenderer();
+        this.shapeRenderer = new ShapeRenderer();
 
         this.uiAtlas = this.assets.getAtlas(AssetPaths.MAP_ATLAS);
         TextureRegion bgRegion = null;
@@ -81,7 +83,7 @@ public class GameScreen implements Screen, InputProcessor {
 
         initGrid();
         for (int i = 0; i < 5; i++) {
-            // Add default Sunflower
+            // 添加默认的向日葵
             addPlant(new Sunflower(this, grid[i][i].x, grid[i][i].y));
         }
 
@@ -119,7 +121,7 @@ public class GameScreen implements Screen, InputProcessor {
             batch.draw(mapBackground, 0f, 0f, MAP_WIDTH, MAP_HEIGHT);
         }
 
-        // Update and draw plants
+        // 更新并绘制植物
         for (int i = plants.size() - 1; i >= 0; i--) {
             BasePlant plant = plants.get(i);
             plant.update(delta);
@@ -129,7 +131,7 @@ public class GameScreen implements Screen, InputProcessor {
             }
         }
 
-        // Update and draw suns
+        // 更新并绘制阳光
         for (int i = suns.size() - 1; i >= 0; i--) {
             Sun sun = suns.get(i);
             sun.update(delta);
@@ -141,10 +143,10 @@ public class GameScreen implements Screen, InputProcessor {
 
         batch.end();
 
-        // Draw grid borders
+        // 绘制网格边框
         shapeRenderer.setProjectionMatrix(worldCamera.combined);
-        shapeRenderer.begin(com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(1, 0, 0, 1); // Red color
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(1, 0, 0, 1); // 红色
         for (int row = 0; row < 5; row++) {
             for (int col = 0; col < 9; col++) {
                 Rectangle rect = grid[row][col];
@@ -239,15 +241,14 @@ public class GameScreen implements Screen, InputProcessor {
 
     /**
      * 初始化 5x9 的格子坐标，用于种植植物的地图网格。
-     * 这里使用简单的占位布局，后续可以根据实际美术调整。
      */
     private void initGrid () {
         for (int row = 0; row < 5; row++) {
             for (int col = 0; col < 9; col++) {
                 float x = GRID_OFFSET_X + col * CELL_WIDTH;
-                // Calculate y relative to top-left:
-                // Map Height - Top Offset - (Row Index + 1) * Cell Height
-                // This makes grid[0][0] the top-left cell
+                // 相对于左上角计算 y 坐标：
+                // 地图高度 - 顶部偏移 - (行索引 + 1) * 单元格高度
+                // 这使得 grid[0][0] 成为左上角的单元格
                 float y = MAP_HEIGHT - GRID_OFFSET_Y - (row + 1) * CELL_HEIGHT;
                 grid[row][col] = new Rectangle(x, y, CELL_WIDTH, CELL_HEIGHT);
             }

@@ -1,5 +1,6 @@
 package work.foofish.pvz.entities;
 
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -9,14 +10,14 @@ import work.foofish.pvz.screens.GameScreen;
 import work.foofish.pvz.utils.AssetPaths;
 
 public class Sun {
-    private static final float LIFETIME = 10f; // Sun disappears after 10 seconds
-    private static final float FALL_SPEED = 50f; // Pixels per second
-    private static final float TARGET_Y = 100f; // Stop falling at this Y
+    private static final float LIFETIME = 10f; // 阳光在10秒后消失
+    private static final float FALL_SPEED = 50f; // 每秒下落像素数
+    private static final float TARGET_Y = 100f; // 停止下落的Y坐标
 
     private final GameScreen screen;
     private final Vector2 position;
     private final Rectangle bounds;
-    private final TextureRegion region;
+    private final Animation<TextureRegion> animation;
     private float stateTime;
     private boolean active;
     private boolean isFalling;
@@ -26,15 +27,16 @@ public class Sun {
         this.position = new Vector2(x, y);
         this.active = true;
         this.stateTime = 0f;
-        this.isFalling = false; // Default to not falling (produced by sunflower)
+        this.isFalling = false; // 默认不下落（由向日葵产生）
 
         TextureAtlas atlas = screen.getAssets().getAtlas(AssetPaths.UI_ATLAS);
-        this.region = atlas.findRegion(AssetPaths.REGION_SUN);
+        this.animation = new Animation<>(0.1f, atlas.findRegions(AssetPaths.REGION_SUN), Animation.PlayMode.LOOP);
 
-        if (this.region != null) {
-            this.bounds = new Rectangle(x, y, region.getRegionWidth(), region.getRegionHeight());
+        TextureRegion firstFrame = animation.getKeyFrame(0);
+        if (firstFrame != null) {
+            this.bounds = new Rectangle(x, y, firstFrame.getRegionWidth(), firstFrame.getRegionHeight());
         } else {
-            this.bounds = new Rectangle(x, y, 50, 50); // Fallback size
+            this.bounds = new Rectangle(x, y, 50, 50); // 备用尺寸
         }
     }
 
@@ -51,14 +53,15 @@ public class Sun {
     }
 
     public void draw(SpriteBatch batch) {
-        if (active && region != null) {
-            batch.draw(region, position.x, position.y);
+        if (active && animation != null) {
+            TextureRegion currentFrame = animation.getKeyFrame(stateTime, true);
+            batch.draw(currentFrame, position.x, position.y);
         }
     }
 
     public void collect() {
         active = false;
-        // TODO: Add logic to increase player's sun currency
+        // TODO: 添加增加玩家阳光货币的逻辑
         System.out.println("Sun collected!");
     }
 
