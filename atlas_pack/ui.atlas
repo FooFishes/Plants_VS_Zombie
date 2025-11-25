@@ -1,8 +1,6 @@
 ui.png
 	size: 2048, 1024
 	repeat: none
-ChooserBackground
-	bounds: 2, 326, 522, 87
 MainMenu
 	bounds: 2, 415, 900, 600
 ZombiesWon
@@ -13,6 +11,8 @@ adventure_up
 	bounds: 904, 504, 166, 70
 car
 	bounds: 1072, 517, 71, 57
+chooser
+	bounds: 2, 326, 522, 87
 shovel
 	bounds: 245, 88, 70, 74
 sun

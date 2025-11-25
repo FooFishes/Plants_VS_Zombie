@@ -6,6 +6,7 @@ public class AssetPaths {
     public static final String PLANTS_ATLAS = "atlases/plants.atlas";
     public static final String ZOMBIES_ATLAS = "atlases/zombies.atlas";
     public static final String UI_ATLAS = "atlases/ui.atlas";
+    public static final String CARD_ATLAS = "atlases/cards.atlas";
 
     // 图集区域名称
     public static final String REGION_SIMPLE_DAY = "simple_day";
@@ -15,6 +16,10 @@ public class AssetPaths {
     public static final String REGION_SUNFLOWER_ACTIVE = "sunflower_active";
 
     public static final String REGION_SUN = "sun";
+
+    public static final String REGION_CHOOSER = "chooser";
+
+    public static final String REGION_CARD_SUNFLOWER = "card_sunflower";
 
     // 字体
     // 如需要，在此添加字体路径

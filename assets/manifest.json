@@ -2,6 +2,7 @@
   "atlases": [
     "atlases/plants.atlas",
     "atlases/ui.atlas",
-    "atlases/maps.atlas"
+    "atlases/maps.atlas",
+    "atlases/cards.atlas"
   ]
 }

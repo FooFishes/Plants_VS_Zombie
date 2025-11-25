@@ -116,8 +116,8 @@ public class Sunflower extends BasePlant {
 
     private void produceSun() {
         // 在植物上方稍微偏移的位置生成阳光
-        float sunX = position.x + 20;
-        float sunY = position.y - 20;
+        float sunX = position.x + 25;
+        float sunY = position.y - 10;
         Sun sun = new Sun(screen, sunX, sunY);
         screen.addSun(sun);
     }
