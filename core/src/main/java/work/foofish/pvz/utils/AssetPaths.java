@@ -55,6 +55,8 @@ public class AssetPaths {
     public static final String REGION_NORMAL_ZOMBIE_WALK = "normal_zombie_walk";
     public static final String REGION_CONEHEAD_ZOMBIE_WALK = "conehead_zombie_walk";
     public static final String REGION_CONEHEAD_ZOMBIE_ATTACK = "conehead_zombie_attack";
+    public static final String REGION_BUCKETHEAD_ZOMBIE_WALK = "buckethead_zombie_walk";
+    public static final String REGION_BUCKETHEAD_ZOMBIE_ATTACK = "buckethead_zombie_attack";
 
     // 字体
     // 如需要，在此添加字体路径

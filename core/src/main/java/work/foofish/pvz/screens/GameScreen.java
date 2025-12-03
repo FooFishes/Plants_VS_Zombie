@@ -25,6 +25,7 @@ import work.foofish.pvz.entities.plants.SnowPea;
 import work.foofish.pvz.entities.plants.Sunflower;
 import work.foofish.pvz.entities.plants.Wallnut;
 import work.foofish.pvz.entities.zombies.BaseZombie;
+import work.foofish.pvz.entities.zombies.BucketheadZombie;
 import work.foofish.pvz.entities.zombies.ConeheadZombie;
 import work.foofish.pvz.entities.zombies.NormalZombie;
 import work.foofish.pvz.ui.Boom;
@@ -1285,6 +1286,7 @@ public class GameScreen implements Screen, InputProcessor {
     }
 
     private class ZombieSpawner {
+        private static final float BUCKETHEAD_CHANCE = 0.15f;
         private static final float CONEHEAD_CHANCE = 0.35f;
         private float spawnTimer;
         private float nextSpawnTime = 5f;
@@ -1304,7 +1306,10 @@ public class GameScreen implements Screen, InputProcessor {
             float spawnY = cell.y;
             float spawnX = MAP_WIDTH - 120f;
             BaseZombie zombie;
-            if (MathUtils.randomBoolean(CONEHEAD_CHANCE)) {
+            float roll = MathUtils.random();
+            if (roll < BUCKETHEAD_CHANCE) {
+                zombie = new BucketheadZombie(GameScreen.this, spawnX, spawnY, row);
+            } else if (roll < BUCKETHEAD_CHANCE + CONEHEAD_CHANCE) {
                 zombie = new ConeheadZombie(GameScreen.this, spawnX, spawnY, row);
             } else {
                 zombie = new NormalZombie(GameScreen.this, spawnX, spawnY, row);
