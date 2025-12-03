@@ -74,6 +74,7 @@ public abstract class BaseZombie {
                 attack(delta);
                 break;
             case DIE:
+            case BOOM_DIE:
                 if (isCurrentAnimationFinished()) {
                     alive = false;
                     state = ZombieState.DEAD;
@@ -121,11 +122,19 @@ public abstract class BaseZombie {
     }
 
     public void takeDamage (int damage) {
+        applyDamage(damage, ZombieState.DIE);
+    }
+
+    public void takeExplosionDamage (int damage) {
+        applyDamage(damage, ZombieState.BOOM_DIE);
+    }
+
+    private void applyDamage (int damage, ZombieState deathState) {
         if (!alive || state == ZombieState.DEAD) return;
         health -= damage;
         if (health <= 0) {
             health = 0;
-            switchTo(ZombieState.DIE);
+            triggerDeath(deathState);
         } else if (!lostHead && health <= getLostHeadThreshold()) {
             lostHead = true;
             if (state == ZombieState.WALK) {
@@ -134,6 +143,11 @@ public abstract class BaseZombie {
                 switchTo(ZombieState.LOST_HEAD_ATTACK);
             }
         }
+    }
+
+    protected void triggerDeath (ZombieState deathState) {
+        targetPlant = null;
+        switchTo(deathState);
     }
 
     protected int getLostHeadThreshold () {
@@ -156,6 +170,13 @@ public abstract class BaseZombie {
         if (!alive && state != ZombieState.DIE) return;
         if (state == ZombieState.DEAD) return;
         Animation<TextureRegion> animation = getAnimation(state);
+        if (animation == null) {
+            return;
+        }
+        TextureRegion[] frames = animation.getKeyFrames();
+        if (frames == null || frames.length == 0) {
+            return;
+        }
         TextureRegion frame = animation.getKeyFrame(stateTime, isLooping(state));
         float scale = getDrawScale();
         float width = frame.getRegionWidth() * scale;
@@ -191,7 +212,7 @@ public abstract class BaseZombie {
     }
 
     private boolean isLooping (ZombieState currentState) {
-        return currentState != ZombieState.DIE && currentState != ZombieState.LOST_HEAD_ATTACK;
+        return currentState != ZombieState.DIE && currentState != ZombieState.LOST_HEAD_ATTACK && currentState != ZombieState.BOOM_DIE;
     }
 
     private boolean isCurrentAnimationFinished () {
@@ -284,6 +305,7 @@ public abstract class BaseZombie {
         LOST_HEAD,
         LOST_HEAD_ATTACK,
         DIE,
+        BOOM_DIE,
         DEAD
     }
 }

@@ -1,240 +1,387 @@
 plants.png
-	size: 2048, 256
+	size: 2048, 512
 	repeat: none
+cherry_bomb
+	index: 4
+	bounds: 2, 403, 112, 81
+cherry_bomb
+	index: 1
+	bounds: 2, 320, 112, 81
+cherry_bomb
+	index: 6
+	bounds: 116, 403, 112, 81
+cherry_bomb
+	index: 3
+	bounds: 2, 237, 112, 81
+cherry_bomb
+	index: 0
+	bounds: 116, 320, 112, 81
+cherry_bomb
+	index: 5
+	bounds: 230, 403, 112, 81
+cherry_bomb
+	index: 2
+	bounds: 2, 154, 112, 81
 peashooter
 	index: 3
-	bounds: 1202, 11, 71, 71
+	bounds: 1805, 337, 71, 71
 peashooter
 	index: 11
-	bounds: 1277, 84, 71, 71
+	bounds: 1878, 337, 71, 71
 peashooter
 	index: 8
-	bounds: 1352, 157, 71, 71
+	bounds: 144, 22, 71, 71
 peashooter
 	index: 0
-	bounds: 1425, 157, 71, 71
+	bounds: 408, 188, 71, 71
 peashooter
 	index: 5
-	bounds: 1498, 157, 71, 71
+	bounds: 554, 261, 71, 71
 peashooter
 	index: 2
-	bounds: 1571, 157, 71, 71
+	bounds: 418, 42, 71, 71
 peashooter
 	index: 10
-	bounds: 1494, 11, 71, 71
+	bounds: 491, 115, 71, 71
 peashooter
 	index: 7
-	bounds: 1644, 157, 71, 71
+	bounds: 694, 264, 71, 71
 peashooter
 	index: 4
-	bounds: 1717, 157, 71, 71
+	bounds: 913, 264, 71, 71
 peashooter
 	index: 12
-	bounds: 1640, 11, 71, 71
+	bounds: 986, 264, 71, 71
 peashooter
 	index: 9
-	bounds: 1715, 84, 71, 71
+	bounds: 1205, 264, 71, 71
 peashooter
 	index: 1
-	bounds: 1863, 157, 71, 71
+	bounds: 1351, 264, 71, 71
 peashooter
 	index: 6
-	bounds: 1786, 11, 71, 71
+	bounds: 1424, 264, 71, 71
 repeaterpea
 	index: 6
-	bounds: 827, 5, 73, 71
+	bounds: 680, 337, 73, 71
 repeaterpea
 	index: 10
-	bounds: 902, 81, 73, 71
+	bounds: 755, 337, 73, 71
 repeaterpea
 	index: 3
-	bounds: 977, 157, 73, 71
+	bounds: 830, 337, 73, 71
 repeaterpea
 	index: 8
-	bounds: 902, 8, 73, 71
+	bounds: 905, 337, 73, 71
 repeaterpea
 	index: 12
-	bounds: 977, 84, 73, 71
+	bounds: 980, 337, 73, 71
 repeaterpea
 	index: 0
-	bounds: 1052, 157, 73, 71
+	bounds: 1055, 337, 73, 71
 repeaterpea
 	index: 5
-	bounds: 977, 11, 73, 71
+	bounds: 1130, 337, 73, 71
 repeaterpea
 	index: 14
-	bounds: 1052, 84, 73, 71
+	bounds: 1205, 337, 73, 71
 repeaterpea
 	index: 2
-	bounds: 1127, 157, 73, 71
+	bounds: 1280, 337, 73, 71
 repeaterpea
 	index: 7
-	bounds: 1052, 11, 73, 71
+	bounds: 1355, 337, 73, 71
 repeaterpea
 	index: 11
-	bounds: 1127, 84, 73, 71
+	bounds: 1430, 337, 73, 71
 repeaterpea
 	index: 4
-	bounds: 1202, 157, 73, 71
+	bounds: 1505, 337, 73, 71
 repeaterpea
 	index: 9
-	bounds: 1127, 11, 73, 71
-repeaterpea
-	index: 1
-	bounds: 1202, 84, 73, 71
+	bounds: 1580, 337, 73, 71
 repeaterpea
 	index: 13
-	bounds: 1277, 157, 73, 71
+	bounds: 1655, 337, 73, 71
+repeaterpea
+	index: 1
+	bounds: 1730, 337, 73, 71
 snow_peashooter
 	index: 8
-	bounds: 1275, 11, 71, 71
+	bounds: 144, 95, 71, 71
 snow_peashooter
 	index: 0
-	bounds: 1350, 84, 71, 71
+	bounds: 408, 261, 71, 71
 snow_peashooter
 	index: 14
-	bounds: 1348, 11, 71, 71
+	bounds: 481, 261, 71, 71
 snow_peashooter
 	index: 5
-	bounds: 1423, 84, 71, 71
+	bounds: 481, 188, 71, 71
 snow_peashooter
 	index: 6
-	bounds: 1423, 84, 71, 71
+	bounds: 481, 188, 71, 71
 snow_peashooter
 	index: 11
-	bounds: 1421, 11, 71, 71
+	bounds: 554, 188, 71, 71
 snow_peashooter
 	index: 2
-	bounds: 1496, 84, 71, 71
+	bounds: 418, 115, 71, 71
 snow_peashooter
 	index: 7
-	bounds: 1569, 84, 71, 71
+	bounds: 491, 42, 71, 71
 snow_peashooter
 	index: 13
-	bounds: 1567, 11, 71, 71
+	bounds: 767, 264, 71, 71
 snow_peashooter
 	index: 4
-	bounds: 1642, 84, 71, 71
-snow_peashooter
-	index: 9
-	bounds: 1790, 157, 71, 71
+	bounds: 840, 264, 71, 71
 snow_peashooter
 	index: 10
-	bounds: 1713, 11, 71, 71
+	bounds: 1059, 264, 71, 71
+snow_peashooter
+	index: 9
+	bounds: 1132, 264, 71, 71
 snow_peashooter
 	index: 1
-	bounds: 1788, 84, 71, 71
+	bounds: 1278, 264, 71, 71
 snow_peashooter
 	index: 12
-	bounds: 1861, 84, 71, 71
+	bounds: 1497, 264, 71, 71
 snow_peashooter
 	index: 3
-	bounds: 1936, 157, 71, 71
+	bounds: 1570, 264, 71, 71
 sunflower_active
 	index: 9
+	bounds: 230, 327, 73, 74
+sunflower_active
+	index: 1
 	bounds: 2, 78, 73, 74
 sunflower_active
-	index: 1
-	bounds: 2, 2, 73, 74
-sunflower_active
 	index: 14
-	bounds: 77, 78, 73, 74
+	bounds: 116, 168, 73, 74
 sunflower_active
 	index: 6
-	bounds: 152, 78, 73, 74
+	bounds: 494, 410, 73, 74
 sunflower_active
 	index: 11
-	bounds: 152, 2, 73, 74
+	bounds: 644, 410, 73, 74
 sunflower_active
 	index: 3
-	bounds: 302, 154, 73, 74
+	bounds: 794, 410, 73, 74
 sunflower_active
 	index: 16
-	bounds: 227, 2, 73, 74
+	bounds: 869, 410, 73, 74
 sunflower_active
 	index: 8
-	bounds: 302, 2, 73, 74
+	bounds: 1094, 410, 73, 74
 sunflower_active
 	index: 0
-	bounds: 452, 154, 73, 74
+	bounds: 1244, 410, 73, 74
 sunflower_active
 	index: 13
-	bounds: 377, 2, 73, 74
+	bounds: 1319, 410, 73, 74
 sunflower_active
 	index: 5
-	bounds: 527, 154, 73, 74
+	bounds: 1469, 410, 73, 74
 sunflower_active
 	index: 10
-	bounds: 527, 78, 73, 74
+	bounds: 1619, 410, 73, 74
 sunflower_active
 	index: 2
-	bounds: 602, 78, 73, 74
+	bounds: 1844, 410, 73, 74
 sunflower_active
 	index: 15
-	bounds: 677, 154, 73, 74
+	bounds: 1919, 410, 73, 74
 sunflower_active
 	index: 7
-	bounds: 752, 154, 73, 74
+	bounds: 305, 327, 73, 74
 sunflower_active
 	index: 12
-	bounds: 752, 78, 73, 74
+	bounds: 266, 175, 73, 74
 sunflower_active
 	index: 4
-	bounds: 752, 2, 73, 74
+	bounds: 455, 334, 73, 74
 sunflower_active
 	index: 17
-	bounds: 827, 78, 73, 74
+	bounds: 530, 334, 73, 74
 sunflower_normal
 	index: 3
-	bounds: 2, 154, 73, 74
+	bounds: 116, 244, 73, 74
 sunflower_normal
 	index: 16
-	bounds: 77, 154, 73, 74
+	bounds: 344, 410, 73, 74
 sunflower_normal
 	index: 8
-	bounds: 152, 154, 73, 74
+	bounds: 419, 410, 73, 74
 sunflower_normal
 	index: 0
-	bounds: 77, 2, 73, 74
+	bounds: 2, 2, 73, 74
 sunflower_normal
 	index: 13
-	bounds: 227, 154, 73, 74
+	bounds: 569, 410, 73, 74
 sunflower_normal
 	index: 5
-	bounds: 227, 78, 73, 74
+	bounds: 719, 410, 73, 74
 sunflower_normal
 	index: 10
-	bounds: 302, 78, 73, 74
+	bounds: 944, 410, 73, 74
 sunflower_normal
 	index: 2
-	bounds: 377, 154, 73, 74
+	bounds: 1019, 410, 73, 74
 sunflower_normal
 	index: 15
-	bounds: 377, 78, 73, 74
+	bounds: 1169, 410, 73, 74
 sunflower_normal
 	index: 7
-	bounds: 452, 78, 73, 74
+	bounds: 1394, 410, 73, 74
 sunflower_normal
 	index: 12
-	bounds: 452, 2, 73, 74
+	bounds: 1544, 410, 73, 74
 sunflower_normal
 	index: 4
-	bounds: 602, 154, 73, 74
+	bounds: 1694, 410, 73, 74
 sunflower_normal
 	index: 17
-	bounds: 527, 2, 73, 74
+	bounds: 1769, 410, 73, 74
 sunflower_normal
 	index: 9
-	bounds: 602, 2, 73, 74
+	bounds: 191, 244, 73, 74
 sunflower_normal
 	index: 1
-	bounds: 677, 78, 73, 74
+	bounds: 191, 168, 73, 74
 sunflower_normal
 	index: 14
-	bounds: 677, 2, 73, 74
+	bounds: 266, 251, 73, 74
 sunflower_normal
 	index: 6
-	bounds: 827, 154, 73, 74
+	bounds: 380, 334, 73, 74
 sunflower_normal
 	index: 11
-	bounds: 902, 154, 73, 74
+	bounds: 605, 334, 73, 74
+wallnut_cracked1
+	index: 2
+	bounds: 217, 93, 65, 73
+wallnut_cracked1
+	index: 7
+	bounds: 284, 25, 65, 73
+wallnut_cracked1
+	index: 4
+	bounds: 564, 38, 65, 73
+wallnut_cracked1
+	index: 9
+	bounds: 1710, 262, 65, 73
+wallnut_cracked1
+	index: 1
+	bounds: 1978, 260, 65, 73
+wallnut_cracked1
+	index: 6
+	bounds: 828, 189, 65, 73
+wallnut_cracked1
+	index: 10
+	bounds: 895, 189, 65, 73
+wallnut_cracked1
+	index: 3
+	bounds: 1230, 189, 65, 73
+wallnut_cracked1
+	index: 8
+	bounds: 1498, 189, 65, 73
+wallnut_cracked1
+	index: 0
+	bounds: 1699, 187, 65, 73
+wallnut_cracked1
+	index: 5
+	bounds: 631, 114, 65, 73
+wallnut_cracked2
+	index: 11
+	bounds: 77, 4, 65, 73
+wallnut_cracked2
+	index: 7
+	bounds: 217, 18, 65, 73
+wallnut_cracked2
+	index: 4
+	bounds: 341, 177, 65, 73
+wallnut_cracked2
+	index: 13
+	bounds: 564, 113, 65, 73
+wallnut_cracked2
+	index: 9
+	bounds: 627, 259, 65, 73
+wallnut_cracked2
+	index: 1
+	bounds: 1643, 262, 65, 73
+wallnut_cracked2
+	index: 10
+	bounds: 1911, 260, 65, 73
+wallnut_cracked2
+	index: 6
+	bounds: 694, 189, 65, 73
+wallnut_cracked2
+	index: 3
+	bounds: 962, 189, 65, 73
+wallnut_cracked2
+	index: 12
+	bounds: 1163, 189, 65, 73
+wallnut_cracked2
+	index: 8
+	bounds: 1297, 189, 65, 73
+wallnut_cracked2
+	index: 0
+	bounds: 1431, 189, 65, 73
+wallnut_cracked2
+	index: 5
+	bounds: 1766, 187, 65, 73
+wallnut_cracked2
+	index: 14
+	bounds: 1967, 185, 65, 73
+wallnut_cracked2
+	index: 2
+	bounds: 698, 114, 65, 73
+wallnut_normal
+	index: 12
+	bounds: 1951, 335, 65, 73
+wallnut_normal
+	index: 3
+	bounds: 77, 79, 65, 73
+wallnut_normal
+	index: 8
+	bounds: 284, 100, 65, 73
+wallnut_normal
+	index: 0
+	bounds: 341, 252, 65, 73
+wallnut_normal
+	index: 14
+	bounds: 351, 102, 65, 73
+wallnut_normal
+	index: 5
+	bounds: 351, 27, 65, 73
+wallnut_normal
+	index: 11
+	bounds: 1777, 262, 65, 73
+wallnut_normal
+	index: 2
+	bounds: 1844, 262, 65, 73
+wallnut_normal
+	index: 7
+	bounds: 761, 189, 65, 73
+wallnut_normal
+	index: 13
+	bounds: 1029, 189, 65, 73
+wallnut_normal
+	index: 4
+	bounds: 1096, 189, 65, 73
+wallnut_normal
+	index: 9
+	bounds: 1364, 189, 65, 73
+wallnut_normal
+	index: 10
+	bounds: 1565, 189, 65, 73
+wallnut_normal
+	index: 1
+	bounds: 1632, 187, 65, 73
+wallnut_normal
+	index: 15
+	bounds: 1833, 187, 65, 73
+wallnut_normal
+	index: 6
+	bounds: 1900, 185, 65, 73

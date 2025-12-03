@@ -18,6 +18,7 @@ import work.foofish.pvz.entities.LawnMower;
 import work.foofish.pvz.entities.Sun;
 import work.foofish.pvz.entities.bullets.PeaBullet;
 import work.foofish.pvz.entities.plants.BasePlant;
+import work.foofish.pvz.entities.plants.CherryBomb;
 import work.foofish.pvz.entities.plants.Peashooter;
 import work.foofish.pvz.entities.plants.RepeaterPea;
 import work.foofish.pvz.entities.plants.SnowPea;
@@ -25,6 +26,7 @@ import work.foofish.pvz.entities.plants.Sunflower;
 import work.foofish.pvz.entities.plants.Wallnut;
 import work.foofish.pvz.entities.zombies.BaseZombie;
 import work.foofish.pvz.entities.zombies.NormalZombie;
+import work.foofish.pvz.ui.Boom;
 import work.foofish.pvz.utils.AssetPaths;
 
 import java.util.ArrayList;
@@ -76,6 +78,7 @@ public class GameScreen implements Screen, InputProcessor {
     private final List<Sun> suns = new ArrayList<>();
     private final List<FlyingSun> flyingSuns = new ArrayList<>();
     private final List<PeaBullet> bullets = new ArrayList<>();
+    private final List<Boom> booms = new ArrayList<>();
     private final List<BaseZombie> zombies = new ArrayList<>();
     private final List<BaseZombie> zombiesView = Collections.unmodifiableList(zombies);
     private final List<LawnMower> lawnMowers = new ArrayList<>();
@@ -133,17 +136,22 @@ public class GameScreen implements Screen, InputProcessor {
         TextureRegion repeaterGhost = null;
         TextureRegion snowPeaGhost = null;
         TextureRegion wallnutGhost = null;
+        TextureRegion cherryBombGhost = null;
         if (plantsAtlas != null) {
             sunflowerGhost = plantsAtlas.findRegion(AssetPaths.REGION_SUNFLOWER_NORMAL);
             peashooterGhost = plantsAtlas.findRegion(AssetPaths.REGION_PEASHOOTER);
             repeaterGhost = plantsAtlas.findRegion(AssetPaths.REGION_REPEATERPEA);
             snowPeaGhost = plantsAtlas.findRegion(AssetPaths.REGION_SNOWPEA);
             wallnutGhost = plantsAtlas.findRegion(AssetPaths.REGION_WALLNUT_NORMAL);
+            cherryBombGhost = plantsAtlas.findRegion(AssetPaths.REGION_CHERRY_BOMB);
             if (snowPeaGhost == null) {
                 snowPeaGhost = peashooterGhost;
             }
             if (wallnutGhost == null) {
                 wallnutGhost = peashooterGhost;
+            }
+            if (cherryBombGhost == null) {
+                cherryBombGhost = peashooterGhost != null ? peashooterGhost : sunflowerGhost;
             }
         }
 
@@ -194,6 +202,15 @@ public class GameScreen implements Screen, InputProcessor {
                 "RepeaterPea",
                 (screen, cell, row, col) -> new RepeaterPea(screen, cell.x, cell.y, row, col)
             ));
+            seedCards.add(new SeedCard(
+                cardAtlas.findRegion(AssetPaths.REGION_CARD_CHERRY_BOMB),
+                cherryBombGhost,
+                150,
+                30f,
+                -18f,
+                "CherryBomb",
+                (screen, cell, row, col) -> new CherryBomb(screen, cell.x, cell.y, row, col)
+            ));
         }
 
         // 创建字体用于显示阳光数量
@@ -222,6 +239,12 @@ public class GameScreen implements Screen, InputProcessor {
     public void addBullet (PeaBullet bullet) {
         if (bullet != null) {
             bullets.add(bullet);
+        }
+    }
+
+    public void addBoom (Boom boom) {
+        if (boom != null) {
+            booms.add(boom);
         }
     }
 
@@ -392,6 +415,14 @@ public class GameScreen implements Screen, InputProcessor {
             }
         }
 
+        for (int i = booms.size() - 1; i >= 0; i--) {
+            Boom boom = booms.get(i);
+            boom.update(delta);
+            if (boom.isFinished()) {
+                booms.remove(i);
+            }
+        }
+
         for (int i = suns.size() - 1; i >= 0; i--) {
             Sun sun = suns.get(i);
             sun.update(delta);
@@ -418,6 +449,10 @@ public class GameScreen implements Screen, InputProcessor {
 
         for (BaseZombie zombie : zombies) {
             zombie.draw(batch);
+        }
+
+        for (Boom boom : booms) {
+            boom.draw(batch);
         }
 
         for (PeaBullet bullet : bullets) {
@@ -461,37 +496,18 @@ public class GameScreen implements Screen, InputProcessor {
         float cardWidth = 54f * scale;
         float cardHeight = 68f * scale;
         // Slot spacing based on debug renderer (64 * scale)
-        float slotSpacing = (64f - 3f) * scale;
+        float cardSpacing = 4f * scale;
         // First card starts at 80px from chooser left edge
         float firstCardOffsetX = 78f * scale;
         // Vertical offset: Center in the chooser height
         // newHeight is the chooser height.
         float slotOffsetY = (newHeight - cardHeight) / 2f;
 
-        float baseCardSpacing = 0f;
-        float previousCardX = 0f;
-        float cumulativeSpacingAdjustment = 0f;
         for (int i = 0; i < seedCards.size(); i++) {
             SeedCard card = seedCards.get(i);
-            float slotX = chooserX + firstCardOffsetX + i * slotSpacing;
+            float slotX = chooserX + firstCardOffsetX + i * (cardWidth + cardSpacing);
             float slotY = chooserY + slotOffsetY;
-            float rawDrawX = slotX + card.offsetX + cumulativeSpacingAdjustment;
-            float drawX = rawDrawX;
-            if (i == 0) {
-                previousCardX = drawX;
-            } else {
-                if (baseCardSpacing == 0f) {
-                    baseCardSpacing = drawX - previousCardX;
-                } else {
-                    float actualSpacing = rawDrawX - previousCardX;
-                    float spacingDiff = baseCardSpacing - actualSpacing;
-                    if (Math.abs(spacingDiff) > 0.0001f) {
-                        drawX += spacingDiff;
-                        cumulativeSpacingAdjustment += spacingDiff;
-                    }
-                }
-                previousCardX = drawX;
-            }
+            float drawX = slotX + card.offsetX;
 
             // Update bounds for click detection
             card.setBounds(drawX, slotY, cardWidth, cardHeight);

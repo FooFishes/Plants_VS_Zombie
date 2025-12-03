@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import work.foofish.pvz.screens.GameScreen;
 import work.foofish.pvz.utils.AssetPaths;
 
@@ -21,6 +22,7 @@ public class NormalZombie extends BaseZombie {
     private final Animation<TextureRegion> lostHeadAttackAnimation;
     private final Animation<TextureRegion> dieAnimation;
     private final Animation<TextureRegion> headAnimation;
+    private final Animation<TextureRegion> boomDieAnimation;
     private boolean headAnimationActive;
     private float headAnimationTime;
     private final Vector2 headPosition = new Vector2();
@@ -39,12 +41,62 @@ public class NormalZombie extends BaseZombie {
             getReferenceHeight(referenceFrame) * DRAW_SCALE);
         this.referenceWidth = getReferenceWidth(referenceFrame) * DRAW_SCALE;
         TextureAtlas atlas = screen.getAssets().getAtlas(AssetPaths.ZOMBIES_ATLAS);
-        this.walkAnimation = new Animation<>(0.09f, atlas.findRegions(AssetPaths.REGION_NORMAL_ZOMBIE_WALK), Animation.PlayMode.LOOP);
-        this.attackAnimation = new Animation<>(0.09f, atlas.findRegions(AssetPaths.REGION_NORMAL_ATTACK), Animation.PlayMode.LOOP);
-        this.lostHeadWalkAnimation = new Animation<>(0.09f, atlas.findRegions(AssetPaths.REGION_NORMAL_ZOMBIE_LOST_HEAD), Animation.PlayMode.LOOP);
-        this.lostHeadAttackAnimation = new Animation<>(0.09f, atlas.findRegions(AssetPaths.REGION_NORMAL_ZOMBIE_LOST_HEAD_ATTACK), Animation.PlayMode.NORMAL);
-        this.dieAnimation = new Animation<>(0.08f, atlas.findRegions(AssetPaths.REGION_NORMAL_ZOMBIE_DIE), Animation.PlayMode.NORMAL);
-        this.headAnimation = new Animation<>(0.08f, atlas.findRegions(AssetPaths.REGION_NORMAL_ZOMBIE_HEAD), Animation.PlayMode.NORMAL);
+        this.walkAnimation = ensureAnimation(
+            atlas,
+            AssetPaths.REGION_NORMAL_ZOMBIE_WALK,
+            0.09f,
+            Animation.PlayMode.LOOP,
+            null,
+            referenceFrame
+        );
+        this.attackAnimation = ensureAnimation(
+            atlas,
+            AssetPaths.REGION_NORMAL_ATTACK,
+            0.09f,
+            Animation.PlayMode.LOOP,
+            walkAnimation,
+            referenceFrame
+        );
+        this.lostHeadWalkAnimation = ensureAnimation(
+            atlas,
+            AssetPaths.REGION_NORMAL_ZOMBIE_LOST_HEAD,
+            0.09f,
+            Animation.PlayMode.LOOP,
+            walkAnimation,
+            referenceFrame
+        );
+        this.lostHeadAttackAnimation = ensureAnimation(
+            atlas,
+            AssetPaths.REGION_NORMAL_ZOMBIE_LOST_HEAD_ATTACK,
+            0.09f,
+            Animation.PlayMode.NORMAL,
+            attackAnimation,
+            referenceFrame
+        );
+        this.dieAnimation = ensureAnimation(
+            atlas,
+            AssetPaths.REGION_NORMAL_ZOMBIE_DIE,
+            0.08f,
+            Animation.PlayMode.NORMAL,
+            walkAnimation,
+            referenceFrame
+        );
+        this.headAnimation = ensureAnimation(
+            atlas,
+            AssetPaths.REGION_NORMAL_ZOMBIE_HEAD,
+            0.08f,
+            Animation.PlayMode.NORMAL,
+            null,
+            null
+        );
+        this.boomDieAnimation = ensureAnimation(
+            atlas,
+            AssetPaths.REGION_NORMAL_ZOMBIE_BOOM_DIE,
+            0.08f,
+            Animation.PlayMode.NORMAL,
+            dieAnimation,
+            referenceFrame
+        );
         this.lostHeadWalkOffset = computeCenteringOffset(referenceWidth, lostHeadWalkAnimation, DRAW_SCALE);
         this.lostHeadAttackOffset = computeCenteringOffset(referenceWidth, lostHeadAttackAnimation, DRAW_SCALE);
     }
@@ -83,6 +135,8 @@ public class NormalZombie extends BaseZombie {
                 return lostHeadAttackAnimation;
             case DIE:
                 return dieAnimation;
+            case BOOM_DIE:
+                return boomDieAnimation != null ? boomDieAnimation : dieAnimation;
             case WALK:
             default:
                 return walkAnimation;
@@ -155,6 +209,47 @@ public class NormalZombie extends BaseZombie {
         TextureRegion firstFrame = animation.getKeyFrames()[0];
         float scaledFrameWidth = firstFrame.getRegionWidth() * scale;
         return (referenceWidth - scaledFrameWidth) / 2f;
+    }
+
+    private static Animation<TextureRegion> ensureAnimation (TextureAtlas atlas,
+                                                             String regionName,
+                                                             float frameDuration,
+                                                             Animation.PlayMode playMode,
+                                                             Animation<TextureRegion> fallbackAnimation,
+                                                             TextureRegion fallbackFrame) {
+        Animation<TextureRegion> animation = createAnimation(atlas, regionName, frameDuration, playMode);
+        if (animation != null) {
+            return animation;
+        }
+        if (fallbackAnimation != null) {
+            return fallbackAnimation;
+        }
+        if (fallbackFrame != null) {
+            Animation<TextureRegion> single = new Animation<>(frameDuration, fallbackFrame);
+            single.setPlayMode(playMode);
+            return single;
+        }
+        return null;
+    }
+
+    private static Animation<TextureRegion> createAnimation (TextureAtlas atlas,
+                                                             String regionName,
+                                                             float frameDuration,
+                                                             Animation.PlayMode playMode) {
+        if (atlas == null) {
+            return null;
+        }
+        Array<TextureAtlas.AtlasRegion> regions = atlas.findRegions(regionName);
+        if (regions != null && regions.size > 0) {
+            return new Animation<>(frameDuration, regions, playMode);
+        }
+        TextureAtlas.AtlasRegion singleRegion = atlas.findRegion(regionName);
+        if (singleRegion != null) {
+            Animation<TextureRegion> animation = new Animation<>(frameDuration, singleRegion);
+            animation.setPlayMode(playMode);
+            return animation;
+        }
+        return null;
     }
 
     private static float getReferenceWidth (TextureRegion referenceFrame) {
