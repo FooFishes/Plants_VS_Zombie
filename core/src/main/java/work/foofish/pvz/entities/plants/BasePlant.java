@@ -12,16 +12,20 @@ public abstract class BasePlant {
     protected final Vector2 position;
     protected final Rectangle bounds;
     protected final Animation<TextureRegion> animation;
+    protected final int row;
+    protected final int col;
     protected float stateTime;
     protected int health;
     protected final int cost;
     protected boolean alive;
     protected final float cooldown;
 
-    protected BasePlant (GameScreen screen, float x, float y, Animation<TextureRegion> animation, int cost, int health, float cooldown) {
+    protected BasePlant (GameScreen screen, float x, float y, int row, int col, Animation<TextureRegion> animation, int cost, int health, float cooldown) {
         this.screen = screen;
         this.cooldown = cooldown;
         this.position = new Vector2(x, y);
+        this.row = row;
+        this.col = col;
         this.animation = animation;
         this.cost = cost;
         this.health = health;
@@ -33,12 +37,13 @@ public abstract class BasePlant {
 
     public void update (float delta) {
         stateTime += delta;
+        bounds.setPosition(position.x, position.y);
         if (alive) {
             action(delta);
         }
     }
 
-    public abstract void action(float delta);
+    public abstract void action (float delta);
 
     public void draw (SpriteBatch batch) {
         if (alive) {
@@ -63,6 +68,14 @@ public abstract class BasePlant {
 
     public Rectangle getBounds () {
         return bounds;
+    }
+
+    public int getRow () {
+        return row;
+    }
+
+    public int getCol () {
+        return col;
     }
 
     public int cost () {

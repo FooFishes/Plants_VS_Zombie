@@ -29,12 +29,12 @@ public class Sunflower extends BasePlant {
     private float productionTimer;
     private float stateTimer;
 
-    public Sunflower(GameScreen screen, float x, float y) {
-        super(screen, x, y,
-              createNormalAnimation(screen),
-              COST,
-              HEALTH,
-              COOLDOWN);
+    public Sunflower (GameScreen screen, float x, float y, int row, int col) {
+        super(screen, x, y, row, col,
+            createNormalAnimation(screen),
+            COST,
+            HEALTH,
+            COOLDOWN);
 
         this.normalAnimation = this.animation;
         TextureAtlas atlas = screen.getAssets().getAtlas(AssetPaths.PLANTS_ATLAS);
@@ -45,13 +45,13 @@ public class Sunflower extends BasePlant {
         this.stateTimer = 0f;
     }
 
-    private static Animation<TextureRegion> createNormalAnimation(GameScreen screen) {
+    private static Animation<TextureRegion> createNormalAnimation (GameScreen screen) {
         TextureAtlas atlas = screen.getAssets().getAtlas(AssetPaths.PLANTS_ATLAS);
         return new Animation<>(0.1f, atlas.findRegions(AssetPaths.REGION_SUNFLOWER_NORMAL), Animation.PlayMode.LOOP);
     }
 
     @Override
-    public void action(float delta) {
+    public void action (float delta) {
         productionTimer += delta;
 
         switch (currentState) {
@@ -64,33 +64,33 @@ public class Sunflower extends BasePlant {
         }
     }
 
-    private void updateIdleState(float delta) {
+    private void updateIdleState (float delta) {
         if (productionTimer >= PRODUCTION_INTERVAL) {
             transitionToProducing();
         }
     }
 
-    private void updateProducingState(float delta) {
+    private void updateProducingState (float delta) {
         stateTimer += delta;
         if (stateTimer >= ACTIVE_DURATION) {
             transitionToIdle();
         }
     }
 
-    private void transitionToProducing() {
+    private void transitionToProducing () {
         currentState = State.PRODUCING;
         stateTimer = 0f;
         productionTimer = 0f;
         produceSun();
     }
 
-    private void transitionToIdle() {
+    private void transitionToIdle () {
         currentState = State.IDLE;
         stateTimer = 0f;
     }
 
     @Override
-    public void draw(SpriteBatch batch) {
+    public void draw (SpriteBatch batch) {
         if (!alive) return;
 
         // 绘制正常帧（始终可见作为基础）
@@ -114,7 +114,7 @@ public class Sunflower extends BasePlant {
         }
     }
 
-    private void produceSun() {
+    private void produceSun () {
         // 在植物上方稍微偏移的位置生成阳光
         float sunX = position.x + 25;
         float sunY = position.y - 10;

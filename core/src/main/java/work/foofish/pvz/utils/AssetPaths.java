@@ -7,6 +7,7 @@ public class AssetPaths {
     public static final String ZOMBIES_ATLAS = "atlases/zombies.atlas";
     public static final String UI_ATLAS = "atlases/ui.atlas";
     public static final String CARD_ATLAS = "atlases/cards.atlas";
+    public static final String BULLETS_ATLAS = "atlases/bullets.atlas";
 
     // 图集区域名称
     public static final String REGION_SIMPLE_DAY = "simple_day";
@@ -19,7 +20,20 @@ public class AssetPaths {
 
     public static final String REGION_CHOOSER = "chooser";
 
+    public static final String REGION_PEASHOOTER = "peashooter";
+
     public static final String REGION_CARD_SUNFLOWER = "card_sunflower";
+    public static final String REGION_CARD_PEASHOOTER = "card_peashooter";
+
+    public static final String REGION_PEA_NORMAL = "pea_normal";
+    public static final String REGION_PEA_NORMAL_EXPLODE = "pea_normal_explode";
+    public static final String REGION_NORMAL_ZOMBIE_WALK = "normal_zombie_walk";
+    public static final String REGION_NORMAL_ATTACK = "normal_zombie_attack";
+    public static final String REGION_NORMAL_ZOMBIE_DIE = "normal_zombie_die";
+    public static final String REGION_NORMAL_ZOMBIE_HEAD = "normal_zombie_head";
+    public static final String REGION_NORMAL_ZOMBIE_LOST_HEAD = "normal_zombie_lost_head";
+    public static final String REGION_NORMAL_ZOMBIE_BOOM_DIE = "normal_zombie_boom_die";
+    public static final String REGION_NORMAL_ZOMBIE_LOST_HEAD_ATTACK = "normal_zombie_lost_head_attack";
 
     // 字体
     // 如需要，在此添加字体路径
@@ -30,7 +44,7 @@ public class AssetPaths {
     // 音效
     // 如需要，在此添加音效路径
 
-    private AssetPaths() {
+    private AssetPaths () {
         // 私有构造函数，防止实例化
     }
 }

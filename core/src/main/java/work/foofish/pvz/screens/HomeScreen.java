@@ -45,7 +45,6 @@ public class HomeScreen implements Screen {
 
         Table table = new Table();
         table.setFillParent(true);
-        table.setDebug(true);
 
         Button adventure = new Button(skin, "adventure_button");
         adventure.addListener(new ChangeListener() {
@@ -90,7 +89,9 @@ public class HomeScreen implements Screen {
 
     @Override
     public void hide () {
-
+        if (Gdx.input.getInputProcessor() == stage) {
+            Gdx.input.setInputProcessor(null);
+        }
     }
 
     @Override

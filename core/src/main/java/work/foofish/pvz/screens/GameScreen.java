@@ -1,9 +1,6 @@
 package work.foofish.pvz.screens;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -18,20 +15,30 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import work.foofish.pvz.AssetService;
 import work.foofish.pvz.PvzGame;
 import work.foofish.pvz.entities.Sun;
+import work.foofish.pvz.entities.bullets.PeaBullet;
 import work.foofish.pvz.entities.plants.BasePlant;
+import work.foofish.pvz.entities.plants.Peashooter;
 import work.foofish.pvz.entities.plants.Sunflower;
+import work.foofish.pvz.entities.zombies.BaseZombie;
+import work.foofish.pvz.entities.zombies.NormalZombie;
 import work.foofish.pvz.utils.AssetPaths;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class GameScreen implements Screen, InputProcessor {
+    private static final String TAG = GameScreen.class.getSimpleName();
     private static final float MAP_WIDTH = 1400f;
     private static final float MAP_HEIGHT = 600f;
     private static final float VIEW_WIDTH = 900f;
     private static final float VIEW_HEIGHT = 600f;
     private static final float INTRO_DURATION = 1.75f;
     private static final float OUTRO_DURATION = 1.25f;
+    private static final int GRID_ROWS = 5;
+    private static final int GRID_COLS = 9;
+    private static final float SKY_SUN_INTERVAL_MIN = 8f;
+    private static final float SKY_SUN_INTERVAL_MAX = 15f;
 
     // 网格配置
     private static final float CELL_WIDTH = 80f;
@@ -42,16 +49,18 @@ public class GameScreen implements Screen, InputProcessor {
     private final PvzGame game;
     private final AssetService assets;
 
-    public AssetService getAssets() {
+    public AssetService getAssets () {
         return assets;
     }
+
     private final OrthographicCamera worldCamera = new OrthographicCamera();
     private final FitViewport worldViewport = new FitViewport(VIEW_WIDTH, VIEW_HEIGHT, worldCamera);
     private final Stage uiStage;
     private final TextureAtlas uiAtlas;
     private final TextureRegion mapBackground;
     private final TextureRegion chooserBackground;
-    private final Rectangle[][] grid = new Rectangle[5][9];
+    private final Rectangle[][] grid = new Rectangle[GRID_ROWS][GRID_COLS];
+    private final Rectangle cameraBoundsCache = new Rectangle();
     private final ShapeRenderer shapeRenderer;
     private final BitmapFont font;
     private GlyphLayout layout;
@@ -62,12 +71,15 @@ public class GameScreen implements Screen, InputProcessor {
     private final List<BasePlant> plants = new ArrayList<>();
     private final List<Sun> suns = new ArrayList<>();
     private final List<FlyingSun> flyingSuns = new ArrayList<>();
+    private final List<PeaBullet> bullets = new ArrayList<>();
+    private final List<BaseZombie> zombies = new ArrayList<>();
+    private final List<BaseZombie> zombiesView = Collections.unmodifiableList(zombies);
 
     // Plant Selection
-    private TextureAtlas cardAtlas;
-    private TextureRegion ghostPlantRegion;
+    private final TextureAtlas cardAtlas;
     private final List<SeedCard> seedCards = new ArrayList<>();
     private SeedCard selectedSeedCard = null;
+    private final GhostPlacement ghostPlacement = new GhostPlacement();
 
     private InputMultiplexer inputMultiplexer;
 
@@ -83,6 +95,11 @@ public class GameScreen implements Screen, InputProcessor {
     // 天空掉落阳光计时器
     private float sunSpawnTimer = 0f;
     private float nextSunSpawnTime = 5f; // 初始5秒后掉落第一个阳光
+    private final ZombieSpawner zombieSpawner = new ZombieSpawner();
+    private boolean debugOverlayEnabled;
+    private final Vector3 worldTouch = new Vector3();
+    private final Vector3 uiTouch = new Vector3();
+    private final Vector3 tmpVec = new Vector3();
 
     public GameScreen (PvzGame game) {
         this.game = game;
@@ -105,18 +122,32 @@ public class GameScreen implements Screen, InputProcessor {
         // Load Card Atlas and Plant Atlas for Ghost
         this.cardAtlas = this.assets.getAtlas(AssetPaths.CARD_ATLAS);
         TextureAtlas plantsAtlas = this.assets.getAtlas(AssetPaths.PLANTS_ATLAS);
+        TextureRegion sunflowerGhost = null;
+        TextureRegion peashooterGhost = null;
         if (plantsAtlas != null) {
-            this.ghostPlantRegion = plantsAtlas.findRegion(AssetPaths.REGION_SUNFLOWER_NORMAL);
+            sunflowerGhost = plantsAtlas.findRegion(AssetPaths.REGION_SUNFLOWER_NORMAL);
+            peashooterGhost = plantsAtlas.findRegion(AssetPaths.REGION_PEASHOOTER);
         }
 
         // Initialize Seed Cards
         if (cardAtlas != null) {
-            // Sunflower Card
             seedCards.add(new SeedCard(
                 cardAtlas.findRegion(AssetPaths.REGION_CARD_SUNFLOWER),
+                sunflowerGhost,
                 50,
+                7.5f,
+                0f,
                 "Sunflower",
-                Sunflower.class
+                (screen, cell, row, col) -> new Sunflower(screen, cell.x, cell.y, row, col)
+            ));
+            seedCards.add(new SeedCard(
+                cardAtlas.findRegion(AssetPaths.REGION_CARD_PEASHOOTER),
+                peashooterGhost,
+                100,
+                7f,
+                -3f,
+                "Peashooter",
+                (screen, cell, row, col) -> new Peashooter(screen, cell.x, cell.y, row, col)
             ));
         }
 
@@ -134,28 +165,43 @@ public class GameScreen implements Screen, InputProcessor {
         snapCameraTo(currentAnchor);
     }
 
-    public void addPlant(BasePlant plant) {
+    public void addPlant (BasePlant plant) {
         plants.add(plant);
     }
 
-    public void addSun(Sun sun) {
+    public void addSun (Sun sun) {
         suns.add(sun);
+    }
+
+    public void addBullet (PeaBullet bullet) {
+        if (bullet != null) {
+            bullets.add(bullet);
+        }
+    }
+
+    public void addZombie (BaseZombie zombie) {
+        if (zombie != null) {
+            zombies.add(zombie);
+        }
     }
 
     /**
      * 增加玩家的阳光货币
+     *
      * @param amount 增加的数量
      */
-    public void addSun(int amount) {
+    public void addSun (int amount) {
         sunCount += amount;
-        System.out.println("Sun collected! Total: " + sunCount);
+        if (Gdx.app != null) {
+            Gdx.app.log(TAG, "Sun collected, total=" + sunCount);
+        }
     }
 
-    private void spawnSkySun() {
+    private void spawnSkySun () {
         // 随机X坐标：在网格范围内 (260 到 260+720)
         // 减去阳光宽度(约50)以防超出
         float minX = GRID_OFFSET_X;
-        float maxX = GRID_OFFSET_X + 9 * CELL_WIDTH - 50f;
+        float maxX = GRID_OFFSET_X + GRID_COLS * CELL_WIDTH - 50f;
         float x = MathUtils.random(minX, maxX);
 
         // 起始Y坐标：屏幕上方
@@ -168,6 +214,72 @@ public class GameScreen implements Screen, InputProcessor {
         sun.setTargetY(MathUtils.random(40f, 450f));
 
         addSun(sun);
+    }
+
+    public boolean hasZombieInRow (int rowIndex) {
+        for (BaseZombie zombie : zombies) {
+            if (zombie.isAlive() && zombie.getRow() == rowIndex) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasVisibleZombieInRow (int rowIndex) {
+        Rectangle cameraBounds = getCameraBounds();
+        for (BaseZombie zombie : zombies) {
+            if (!zombie.isAlive() || zombie.getRow() != rowIndex) {
+                continue;
+            }
+            Rectangle detectionArea = zombie.getCollisionBounds();
+            if (cameraBounds.contains(detectionArea)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Rectangle getCameraBounds () {
+        float left = worldCamera.position.x - VIEW_WIDTH / 2f;
+        float bottom = worldCamera.position.y - VIEW_HEIGHT / 2f;
+        cameraBoundsCache.set(left, bottom, VIEW_WIDTH, VIEW_HEIGHT);
+        return cameraBoundsCache;
+    }
+
+    public BasePlant findPlantInRow (int rowIndex, Rectangle area) {
+        for (BasePlant plant : plants) {
+            if (!plant.isAlive() || plant.getRow() != rowIndex) {
+                continue;
+            }
+            if (plant.getBounds().overlaps(area)) {
+                return plant;
+            }
+        }
+        return null;
+    }
+
+    private boolean isCellOccupied (int row, int col) {
+        Rectangle cell = grid[row][col];
+        for (BasePlant plant : plants) {
+            if (!plant.isAlive()) {
+                continue;
+            }
+            Rectangle pBounds = plant.getBounds();
+            float centerX = pBounds.x + pBounds.width / 2f;
+            float centerY = pBounds.y + pBounds.height / 2f;
+            if (cell.contains(centerX, centerY)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<BaseZombie> getZombies () {
+        return zombiesView;
+    }
+
+    public float getWorldWidth () {
+        return MAP_WIDTH;
     }
 
     @Override
@@ -187,8 +299,9 @@ public class GameScreen implements Screen, InputProcessor {
             if (sunSpawnTimer >= nextSunSpawnTime) {
                 spawnSkySun();
                 sunSpawnTimer = 0f;
-                nextSunSpawnTime = MathUtils.random(2f, 3f); // 随机间隔 8-15 秒
+                nextSunSpawnTime = MathUtils.random(SKY_SUN_INTERVAL_MIN, SKY_SUN_INTERVAL_MAX); // 随机间隔 8-15 秒
             }
+            zombieSpawner.update(delta);
 
             // Update Seed Cards Cooldown
             for (SeedCard card : seedCards) {
@@ -200,33 +313,61 @@ public class GameScreen implements Screen, InputProcessor {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // 使用世界相机渲染地图背景
-        SpriteBatch batch = game.batch;
-        batch.setProjectionMatrix(worldCamera.combined);
-        batch.begin();
-
-        if (mapBackground != null) {
-            // 把整张 1400x600 的地图画在世界坐标系中，由相机裁剪出 900x600 的可见区域
-            batch.draw(mapBackground, 0f, 0f, MAP_WIDTH, MAP_HEIGHT);
+        // 先更新世界实体，确保逻辑顺序为僵尸 -> 植物 -> 子弹 -> 阳光
+        for (int i = zombies.size() - 1; i >= 0; i--) {
+            BaseZombie zombie = zombies.get(i);
+            zombie.update(delta);
+            if (!zombie.isAlive()) {
+                zombies.remove(i);
+            }
         }
 
-        // 更新并绘制植物
         for (int i = plants.size() - 1; i >= 0; i--) {
             BasePlant plant = plants.get(i);
             plant.update(delta);
-            plant.draw(batch);
             if (!plant.isAlive()) {
                 plants.remove(i);
             }
         }
 
-        // 更新并绘制阳光
+        for (int i = bullets.size() - 1; i >= 0; i--) {
+            PeaBullet bullet = bullets.get(i);
+            bullet.update(delta);
+            if (!bullet.isAlive()) {
+                bullets.remove(i);
+            }
+        }
+
         for (int i = suns.size() - 1; i >= 0; i--) {
             Sun sun = suns.get(i);
             sun.update(delta);
-            sun.draw(batch);
             if (!sun.isActive()) {
                 suns.remove(i);
             }
+        }
+
+        SpriteBatch batch = game.batch;
+        batch.setProjectionMatrix(worldCamera.combined);
+        batch.begin();
+
+        if (mapBackground != null) {
+            batch.draw(mapBackground, 0f, 0f, MAP_WIDTH, MAP_HEIGHT);
+        }
+
+        for (BasePlant plant : plants) {
+            plant.draw(batch);
+        }
+
+        for (BaseZombie zombie : zombies) {
+            zombie.draw(batch);
+        }
+
+        for (PeaBullet bullet : bullets) {
+            bullet.draw(batch);
+        }
+
+        for (Sun sun : suns) {
+            sun.draw(batch);
         }
 
         batch.end();
@@ -234,7 +375,6 @@ public class GameScreen implements Screen, InputProcessor {
         // 使用UI相机渲染顶部植物选择栏和阳光计数
         batch.setProjectionMatrix(uiStage.getCamera().combined);
         batch.begin();
-
 
 
         // 计算 chooser 的位置
@@ -273,19 +413,20 @@ public class GameScreen implements Screen, InputProcessor {
             SeedCard card = seedCards.get(i);
             float slotX = chooserX + firstCardOffsetX + i * slotSpacing;
             float slotY = chooserY + slotOffsetY;
+            float drawX = slotX + card.offsetX;
 
             // Update bounds for click detection
-            card.setBounds(slotX, slotY, cardWidth, cardHeight);
+            card.setBounds(drawX, slotY, cardWidth, cardHeight);
 
             // Tint if your sun cannot afford
-            if (sunCount < card.cost) {
+            if (!card.isSelectable(sunCount)) {
                 batch.setColor(0.5f, 0.5f, 0.5f, 1f);
             } else {
                 batch.setColor(Color.WHITE);
             }
 
             if (card.region != null) {
-                batch.draw(card.region, slotX, slotY, cardWidth, cardHeight);
+                batch.draw(card.region, drawX, slotY, cardWidth, cardHeight);
             }
 
             // Reset color
@@ -319,7 +460,7 @@ public class GameScreen implements Screen, InputProcessor {
             batch.setColor(Color.WHITE);
 
             if (progress >= 1f) {
-                addSun(25);
+                addSun(fs.reward);
                 flyingSuns.remove(i);
             }
         }
@@ -355,135 +496,146 @@ public class GameScreen implements Screen, InputProcessor {
             font.draw(batch, sunString, textX, textY);
         }
 
-        // Draw Ghost Plant if planting
-        // Draw Ghost Plant if planting
-        if (selectedSeedCard != null && ghostPlantRegion != null) {
-            float mouseX = Gdx.input.getX();
-            float mouseY = Gdx.input.getY();
-
-            // Convert mouse screen coordinates to world coordinates for grid checking
-            Vector3 worldMouse = worldViewport.unproject(new Vector3(mouseX, mouseY, 0));
-
-            float drawX = -9999; // Default to off-screen if logic fails
-            float drawY = -9999;
-            boolean snapped = false;
-
-            // Check if mouse is over any grid cell
-            for (int row = 0; row < 5; row++) {
-                for (int col = 0; col < 9; col++) {
-                    Rectangle cell = grid[row][col];
-                    if (cell.contains(worldMouse.x, worldMouse.y)) {
-                        drawX = cell.x;
-                        drawY = cell.y;
-                        snapped = true;
-                        break;
-                    }
-                }
-                if (snapped) break;
-            }
-
-            // If not snapped to grid, follow the mouse (convert screen to world for drawing)
-            if (!snapped) {
-                drawX = worldMouse.x - ghostPlantRegion.getRegionWidth() / 2f;
-                drawY = worldMouse.y - ghostPlantRegion.getRegionHeight() / 2f;
-            }
-
-            // Draw the ghost plant
-            // Note: We are inside a batch block using uiStage camera currently (lines 235-378)
-            // BUT the grid coordinates are in World space.
-            // We should probably draw the ghost plant in World space if it's snapped to the grid,
-            // or convert World coords to UI coords.
-            // Given the structure, it's easier to end the UI batch, begin a World batch, draw ghost, end World batch, restart UI batch.
-            // OR just project the world coordinates to UI coordinates.
-
-            batch.end(); // End UI batch
-
-            batch.setProjectionMatrix(worldCamera.combined);
-            batch.begin(); // Begin World batch
-
-            batch.setColor(1f, 1f, 1f, 0.5f); // Semi-transparent
-            batch.draw(ghostPlantRegion, drawX, drawY);
-            batch.setColor(Color.WHITE);
-
-            batch.end(); // End World batch
-
-            batch.setProjectionMatrix(uiStage.getCamera().combined);
-            batch.begin(); // Resume UI batch for remaining UI elements (if any)
-        }
+        drawGhostPlant(batch);
 
         batch.end();
-
-        // 绘制UI网格边框 (chooser slots)
-        shapeRenderer.setProjectionMatrix(uiStage.getCamera().combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(0.5f, 0.2f, 0f, 1f); // 深棕色
 
         float slotWidth = 64 * scale; // 缩放 slot 宽度
         float slotHeight = newHeight;
 
-        for (int i = 0; i < 8; i++) {
-            float x = chooserX + i * slotWidth;
-            float y = chooserY;
-            shapeRenderer.rect(x, y, slotWidth, slotHeight);
+        if (debugOverlayEnabled) {
+            shapeRenderer.setProjectionMatrix(uiStage.getCamera().combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            shapeRenderer.setColor(0.5f, 0.2f, 0f, 1f); // 深棕色
+            for (int i = 0; i < 8; i++) {
+                float x = chooserX + i * slotWidth;
+                float y = chooserY;
+                shapeRenderer.rect(x, y, slotWidth, slotHeight);
+            }
+            shapeRenderer.end();
         }
-        shapeRenderer.end();
 
-        // Draw Cooldown Overlay (using ShapeRenderer)
         Gdx.gl.glEnable(GL20.GL_BLEND);
         shapeRenderer.setProjectionMatrix(uiStage.getCamera().combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(0, 0, 0, 0.5f);
         for (SeedCard card : seedCards) {
-            if (card.cooldownTimer > 0) {
+            if (card == selectedSeedCard) {
+                shapeRenderer.setColor(1f, 1f, 1f, 0.2f);
+                shapeRenderer.rect(card.x - 2f, card.y - 2f, card.width + 4f, card.height + 4f);
+            }
+            if (card.cooldownTimer > 0f) {
                 float ratio = card.cooldownTimer / card.cooldownMax;
-                shapeRenderer.rect(card.x, card.y, card.width, card.height * ratio);
+                float overlayHeight = card.height * ratio;
+                float overlayY = card.y + card.height - overlayHeight;
+                shapeRenderer.setColor(0f, 0f, 0f, 0.5f);
+                shapeRenderer.rect(card.x, overlayY, card.width, overlayHeight);
             }
         }
         shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
 
 
-        // 绘制网格边框 - 使用轻微的内缩以清晰显示每个单元格的边界
-        // 这样可以避免相邻单元格的边框重叠，使视觉边界与点击检测边界一致
-        shapeRenderer.setProjectionMatrix(worldCamera.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(1, 0, 0, 1); // 红色
-        float borderInset = 0.5f; // 边框内缩0.5像素，使边界更清晰
-        for (int row = 0; row < 5; row++) {
-            for (int col = 0; col < 9; col++) {
-                Rectangle rect = grid[row][col];
-                // 绘制稍微内缩的边框，这样可以清楚地看到每个格子的实际范围
-                shapeRenderer.rect(
-                    rect.x + borderInset,
-                    rect.y + borderInset,
-                    rect.width - 2 * borderInset,
-                    rect.height - 2 * borderInset
-                );
-            }
-        }
-        shapeRenderer.end();
-
-        // 绘制网格索引标签用于调试
-        batch.setProjectionMatrix(worldCamera.combined);
-        batch.begin();
-        if (font != null) {
-            font.setColor(Color.YELLOW); // 黄色标签
-            for (int row = 0; row < 5; row++) {
-                for (int col = 0; col < 9; col++) {
+        if (debugOverlayEnabled) {
+            // 绘制网格边框 - 使用轻微的内缩以清晰显示每个单元格的边界
+            shapeRenderer.setProjectionMatrix(worldCamera.combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            shapeRenderer.setColor(1, 0, 0, 1); // 红色
+            float borderInset = 0.5f; // 边框内缩0.5像素，使边界更清晰
+            for (int row = 0; row < GRID_ROWS; row++) {
+                for (int col = 0; col < GRID_COLS; col++) {
                     Rectangle rect = grid[row][col];
-                    String label = row + "," + col;
-                    GlyphLayout labelLayout = new GlyphLayout(font, label);
-                    // 在每个格子中心绘制标签
-                    font.draw(batch, label,
-                        rect.x + (rect.width - labelLayout.width) / 2f,
-                        rect.y + (rect.height + labelLayout.height) / 2f);
+                    shapeRenderer.rect(
+                        rect.x + borderInset,
+                        rect.y + borderInset,
+                        rect.width - 2 * borderInset,
+                        rect.height - 2 * borderInset
+                    );
                 }
             }
-            font.setColor(Color.BLACK); // 恢复原来的颜色
+            shapeRenderer.end();
+
+            // 绘制网格索引标签用于调试
+            batch.setProjectionMatrix(worldCamera.combined);
+            batch.begin();
+            if (font != null) {
+                font.setColor(Color.YELLOW); // 黄色标签
+                for (int row = 0; row < GRID_ROWS; row++) {
+                    for (int col = 0; col < GRID_COLS; col++) {
+                        Rectangle rect = grid[row][col];
+                        String label = row + "," + col;
+                        GlyphLayout labelLayout = new GlyphLayout(font, label);
+                        font.draw(batch, label,
+                            rect.x + (rect.width - labelLayout.width) / 2f,
+                            rect.y + (rect.height + labelLayout.height) / 2f);
+                    }
+                }
+                font.setColor(Color.BLACK); // 恢复原来的颜色
+            }
+            batch.end();
         }
-        batch.end();
 
         uiStage.act(delta);
         uiStage.draw();
+    }
+
+    private void drawGhostPlant (SpriteBatch batch) {
+        if (selectedSeedCard == null) {
+            return;
+        }
+        TextureRegion ghostRegion = selectedSeedCard.getGhostRegion();
+        if (ghostRegion == null) {
+            return;
+        }
+
+        GhostPlacement placement = calculateGhostPlacement(ghostRegion);
+
+        batch.end();
+        batch.setProjectionMatrix(worldCamera.combined);
+        batch.begin();
+
+        Color current = batch.getColor();
+        float oldR = current.r;
+        float oldG = current.g;
+        float oldB = current.b;
+        float oldA = current.a;
+
+        if (placement.validPlacement) {
+            batch.setColor(1f, 1f, 1f, 0.55f);
+        } else {
+            batch.setColor(1f, 0.4f, 0.4f, 0.4f);
+        }
+        batch.draw(ghostRegion, placement.drawX, placement.drawY);
+        batch.setColor(oldR, oldG, oldB, oldA);
+
+        batch.end();
+        batch.setProjectionMatrix(uiStage.getCamera().combined);
+        batch.begin();
+    }
+
+    private GhostPlacement calculateGhostPlacement (TextureRegion ghostRegion) {
+        ghostPlacement.reset();
+        worldTouch.set(Gdx.input.getX(), Gdx.input.getY(), 0f);
+        worldViewport.unproject(worldTouch);
+
+        ghostPlacement.drawX = worldTouch.x - ghostRegion.getRegionWidth() / 2f;
+        ghostPlacement.drawY = worldTouch.y - ghostRegion.getRegionHeight() / 2f;
+
+        for (int row = 0; row < GRID_ROWS; row++) {
+            for (int col = 0; col < GRID_COLS; col++) {
+                Rectangle cell = grid[row][col];
+                if (cell.contains(worldTouch.x, worldTouch.y)) {
+                    ghostPlacement.drawX = cell.x;
+                    ghostPlacement.drawY = cell.y;
+                    ghostPlacement.snapped = true;
+                    ghostPlacement.row = row;
+                    ghostPlacement.col = col;
+                    ghostPlacement.validPlacement = !isCellOccupied(row, col);
+                    return ghostPlacement;
+                }
+            }
+        }
+
+        return ghostPlacement;
     }
 
     @Override
@@ -573,18 +725,20 @@ public class GameScreen implements Screen, InputProcessor {
      * 初始化 5x9 的格子坐标，用于种植植物的地图网格。
      */
     private void initGrid () {
-        System.out.println("[DEBUG] Initializing grid...");
-        for (int row = 0; row < 5; row++) {
-            for (int col = 0; col < 9; col++) {
+        if (Gdx.app != null) {
+            Gdx.app.debug(TAG, "Initializing grid");
+        }
+        for (int row = 0; row < GRID_ROWS; row++) {
+            for (int col = 0; col < GRID_COLS; col++) {
                 float x = GRID_OFFSET_X + col * CELL_WIDTH;
                 // 相对于左上角计算 y 坐标：
                 // 地图高度 - 顶部偏移 - (行索引 + 1) * 单元格高度
                 // 这使得 grid[0][0] 成为左上角的单元格
                 float y = MAP_HEIGHT - GRID_OFFSET_Y - (row + 1) * CELL_HEIGHT;
                 grid[row][col] = new Rectangle(x, y, CELL_WIDTH, CELL_HEIGHT);
-                if (row == 0 && col < 3) { // Only print first few cells to avoid spam
-                    System.out.printf("[DEBUG] grid[%d][%d]: x=%.2f-%.2f, y=%.2f-%.2f%n",
-                        row, col, x, x + CELL_WIDTH, y, y + CELL_HEIGHT);
+                if (row == 0 && col < 3 && Gdx.app != null) {
+                    Gdx.app.debug(TAG, String.format("grid[%d][%d]: x=%.2f-%.2f, y=%.2f-%.2f",
+                        row, col, x, x + CELL_WIDTH, y, y + CELL_HEIGHT));
                 }
             }
         }
@@ -592,6 +746,17 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public boolean keyDown (int keycode) {
+        if (keycode == Input.Keys.F1) {
+            debugOverlayEnabled = !debugOverlayEnabled;
+            if (Gdx.app != null) {
+                Gdx.app.log(TAG, "Debug overlay " + (debugOverlayEnabled ? "enabled" : "disabled"));
+            }
+            return true;
+        }
+        if (keycode == Input.Keys.ESCAPE) {
+            selectedSeedCard = null;
+            return true;
+        }
         return false;
     }
 
@@ -609,19 +774,26 @@ public class GameScreen implements Screen, InputProcessor {
     public boolean touchDown (int screenX, int screenY, int pointer, int button) {
         // 将屏幕坐标转换为世界坐标
         // 使用 viewport.unproject 而不是 camera.unproject，以正确处理视口偏移和缩放
-        Vector3 worldCoords = worldViewport.unproject(new Vector3(screenX, screenY, 0));
+        worldTouch.set(screenX, screenY, 0f);
+        worldViewport.unproject(worldTouch);
 
         // 检查是否点击了任何阳光
         for (int i = suns.size() - 1; i >= 0; i--) {
             Sun sun = suns.get(i);
-            if (sun.isActive() && sun.getBounds().contains(worldCoords.x, worldCoords.y)) {
-                sun.setCollected(true); // 标记为已收集，防止消失或下落
+            if (!sun.canBeCollected()) {
+                continue;
+            }
+            if (sun.getBounds().contains(worldTouch.x, worldTouch.y)) {
+                int reward = sun.collect();
+                if (reward <= 0) {
+                    continue;
+                }
 
                 // 计算屏幕坐标 (UI Stage Coordinates)
-                Vector3 pos = new Vector3(sun.getPosition().x, sun.getPosition().y, 0);
-                worldViewport.project(pos); // 转换为屏幕像素坐标 (Y向上)
-                pos.y = Gdx.graphics.getHeight() - pos.y; // 翻转Y轴以匹配 unproject 的输入要求 (Y向下)
-                uiStage.getViewport().unproject(pos); // 转换为UI视口坐标
+                tmpVec.set(sun.getPosition().x, sun.getPosition().y, 0f);
+                worldViewport.project(tmpVec); // 转换为屏幕像素坐标 (Y向上)
+                tmpVec.y = Gdx.graphics.getHeight() - tmpVec.y; // 翻转Y轴
+                uiStage.getViewport().unproject(tmpVec); // 转换为UI视口坐标
 
                 // 计算目标位置 (Chooser 阳光图标中心)
                 float chooserX = 30f;
@@ -640,7 +812,7 @@ public class GameScreen implements Screen, InputProcessor {
                 float targetX = targetCenterX - sunW / 2f;
                 float targetY = targetCenterY - sunH / 2f;
 
-                flyingSuns.add(new FlyingSun(sun, pos.x, pos.y, targetX, targetY));
+                flyingSuns.add(new FlyingSun(sun, tmpVec.x, tmpVec.y, targetX, targetY, reward));
                 suns.remove(i); // 从世界列表中移除
 
                 return true; // 消耗此事件
@@ -648,22 +820,22 @@ public class GameScreen implements Screen, InputProcessor {
         }
 
         // Check Card Clicks (UI Coordinates)
-        Vector3 uiCoords = new Vector3(screenX, screenY, 0);
-        uiStage.getViewport().unproject(uiCoords);
+        uiTouch.set(screenX, screenY, 0f);
+        uiStage.getViewport().unproject(uiTouch);
 
         for (SeedCard card : seedCards) {
-            if (card.contains(uiCoords.x, uiCoords.y)) {
-                // If clicking the already selected card, deselect it
-                if (selectedSeedCard == card) {
-                    selectedSeedCard = null;
-                    return true;
-                }
-                // Otherwise select the new card if affordable and ready
-                if (sunCount >= card.cost && card.cooldownTimer <= 0) {
-                    selectedSeedCard = card;
-                    return true;
-                }
+            if (!card.contains(uiTouch.x, uiTouch.y)) {
+                continue;
             }
+            if (selectedSeedCard == card) {
+                selectedSeedCard = null;
+                return true;
+            }
+            if (card.isSelectable(sunCount)) {
+                selectedSeedCard = card;
+                return true;
+            }
+            return true;
         }
 
         // Handle Planting (World Coordinates)
@@ -675,33 +847,19 @@ public class GameScreen implements Screen, InputProcessor {
             }
 
             // Check if clicked on a valid grid cell
-            for (int row = 0; row < 5; row++) {
-                for (int col = 0; col < 9; col++) {
+            for (int row = 0; row < GRID_ROWS; row++) {
+                for (int col = 0; col < GRID_COLS; col++) {
                     Rectangle cell = grid[row][col];
-                    if (cell.contains(worldCoords.x, worldCoords.y)) {
-                        // Check if cell is empty (simple check: no plant center in cell)
-                        boolean occupied = false;
-                        for (BasePlant p : plants) {
-                            // Simple collision check using bounds
-                            Rectangle pBounds = p.getBounds();
-                            float pCenterX = pBounds.x + pBounds.width / 2f;
-                            float pCenterY = pBounds.y + pBounds.height / 2f;
-                            if (cell.contains(pCenterX, pCenterY)) {
-                                occupied = true;
-                                break;
+                    if (cell.contains(worldTouch.x, worldTouch.y)) {
+                        if (!isCellOccupied(row, col)) {
+                            BasePlant plant = selectedSeedCard.createPlant(this, cell, row, col);
+                            if (plant != null) {
+                                addPlant(plant);
+                                sunCount -= selectedSeedCard.cost;
+                                selectedSeedCard.triggerCooldown();
+                                selectedSeedCard = null;
+                                return true;
                             }
-                        }
-
-                        if (!occupied) {
-                            // Plant it!
-                            if (selectedSeedCard.plantName.equals("Sunflower")) {
-                                addPlant(new Sunflower(this, cell.x, cell.y));
-                            }
-                            // Deduct sun and start cooldown
-                            sunCount -= selectedSeedCard.cost;
-                            selectedSeedCard.cooldownTimer = selectedSeedCard.cooldownMax;
-                            selectedSeedCard = null; // Deselect after planting
-                            return true;
                         }
                     }
                 }
@@ -752,20 +910,40 @@ public class GameScreen implements Screen, InputProcessor {
         }
     }
 
+    private static class GhostPlacement {
+        float drawX;
+        float drawY;
+        boolean snapped;
+        boolean validPlacement;
+        int row = -1;
+        int col = -1;
+
+        void reset () {
+            drawX = -9999f;
+            drawY = -9999f;
+            snapped = false;
+            validPlacement = false;
+            row = -1;
+            col = -1;
+        }
+    }
+
     private static class FlyingSun {
         Sun sun;
         float startX, startY;
         float targetX, targetY;
         float time;
         float duration = 0.7f; // 飞行时间
+        int reward;
 
-        public FlyingSun(Sun sun, float startX, float startY, float targetX, float targetY) {
+        public FlyingSun (Sun sun, float startX, float startY, float targetX, float targetY, int reward) {
             this.sun = sun;
             this.startX = startX;
             this.startY = startY;
             this.targetX = targetX;
             this.targetY = targetY;
             this.time = 0;
+            this.reward = reward;
         }
     }
 
@@ -774,38 +952,88 @@ public class GameScreen implements Screen, InputProcessor {
         PLAY,
         OUTRO
     }
-    private static class SeedCard {
-        TextureRegion region;
-        float x, y, width, height;
-        int cost;
-        float cooldownMax = 7.5f;
-        float cooldownTimer = 0f;
-        String plantName;
-        Class<? extends BasePlant> plantType;
 
-        public SeedCard(TextureRegion region, int cost, String plantName, Class<? extends BasePlant> plantType) {
-            this.region = region;
-            this.cost = cost;
-            this.plantName = plantName;
-            this.plantType = plantType;
+    private class ZombieSpawner {
+        private float spawnTimer;
+        private float nextSpawnTime = 5f;
+
+        void update (float delta) {
+            spawnTimer += delta;
+            if (spawnTimer >= nextSpawnTime) {
+                spawnTimer = 0f;
+                spawnZombie();
+                nextSpawnTime = MathUtils.random(4f, 7f);
+            }
         }
 
-        public void update(float delta) {
+        private void spawnZombie () {
+            int row = MathUtils.random(0, grid.length - 1);
+            Rectangle cell = grid[row][grid[row].length - 1];
+            float spawnY = cell.y;
+            float spawnX = MAP_WIDTH - 120f;
+            addZombie(new NormalZombie(GameScreen.this, spawnX, spawnY, row));
+        }
+    }
+
+    private static class SeedCard {
+        TextureRegion region;
+        TextureRegion ghostRegion;
+        float x, y, width, height;
+        int cost;
+        float cooldownMax;
+        float cooldownTimer = 0f;
+        String plantName;
+        PlantFactory plantFactory;
+        final float offsetX;
+
+        public SeedCard (TextureRegion region, TextureRegion ghostRegion, int cost, float cooldownMax, float offsetX, String plantName, PlantFactory plantFactory) {
+            this.region = region;
+            this.ghostRegion = ghostRegion;
+            this.cost = cost;
+            this.cooldownMax = cooldownMax;
+            this.offsetX = offsetX;
+            this.plantName = plantName;
+            this.plantFactory = plantFactory;
+        }
+
+        public void update (float delta) {
             if (cooldownTimer > 0) {
                 cooldownTimer -= delta;
                 if (cooldownTimer < 0) cooldownTimer = 0;
             }
         }
 
-        public void setBounds(float x, float y, float width, float height) {
+        public void triggerCooldown () {
+            cooldownTimer = cooldownMax;
+        }
+
+        public void setBounds (float x, float y, float width, float height) {
             this.x = x;
             this.y = y;
             this.width = width;
             this.height = height;
         }
 
-        public boolean contains(float x, float y) {
+        public boolean contains (float x, float y) {
             return x >= this.x && x <= this.x + width && y >= this.y && y <= this.y + height;
         }
+
+        public boolean isSelectable (int currentSun) {
+            return currentSun >= cost && cooldownTimer <= 0f;
+        }
+
+        public TextureRegion getGhostRegion () {
+            return ghostRegion;
+        }
+
+        public BasePlant createPlant (GameScreen screen, Rectangle cell, int row, int col) {
+            if (plantFactory == null) return null;
+            return plantFactory.create(screen, cell, row, col);
+        }
+    }
+
+    @FunctionalInterface
+    private interface PlantFactory {
+        BasePlant create (GameScreen screen, Rectangle cell, int row, int col);
     }
 }

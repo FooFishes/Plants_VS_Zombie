@@ -13,6 +13,7 @@ public class Sun {
     private static final float LIFETIME = 10f; // 阳光在10秒后消失
     private static final float FALL_SPEED = 40f; // 每秒下落像素数
     private static final float SCALE = 0.9f; // 缩放比例
+    private static final int DEFAULT_VALUE = 25;
 
     private final GameScreen screen;
     private final Vector2 position;
@@ -24,15 +25,24 @@ public class Sun {
     private boolean isFalling;
     private boolean isCollected = false;
     private float targetY = 100f; // 停止下落的Y坐标
+    private final int value;
 
-    public Sun(GameScreen screen, float x, float y) {
+    public Sun (GameScreen screen, float x, float y) {
+        this(screen, x, y, DEFAULT_VALUE);
+    }
+
+    public Sun (GameScreen screen, float x, float y, int value) {
         this.screen = screen;
         this.position = new Vector2(x, y);
         this.active = true;
         this.stateTime = 0f;
         this.isFalling = false; // 默认不下落（由向日葵产生）
+        this.value = value;
 
         TextureAtlas atlas = screen.getAssets().getAtlas(AssetPaths.UI_ATLAS);
+        if (atlas == null) {
+            throw new IllegalStateException("UI atlas is required to render suns");
+        }
         this.animation = new Animation<>(0.1f, atlas.findRegions(AssetPaths.REGION_SUN), Animation.PlayMode.LOOP);
 
         TextureRegion firstFrame = animation.getKeyFrame(0);
@@ -43,7 +53,7 @@ public class Sun {
         }
     }
 
-    public void update(float delta) {
+    public void update (float delta) {
         stateTime += delta;
 
         // 如果已被收集，仅更新动画状态，不处理下落和消失逻辑
@@ -70,40 +80,46 @@ public class Sun {
         }
     }
 
-    public void setFalling(boolean falling) {
+    public void setFalling (boolean falling) {
         this.isFalling = falling;
     }
 
-    public void setTargetY(float targetY) {
+    public void setTargetY (float targetY) {
         this.targetY = targetY;
     }
 
-    public void setCollected(boolean collected) {
-        this.isCollected = collected;
+    public boolean canBeCollected () {
+        return active && !isCollected;
     }
 
-    public void draw(SpriteBatch batch) {
+    public int collect () {
+        if (!canBeCollected()) {
+            return 0;
+        }
+        isCollected = true;
+        return value;
+    }
+
+    public void draw (SpriteBatch batch) {
         if (active && animation != null) {
             TextureRegion currentFrame = animation.getKeyFrame(stateTime, true);
             batch.draw(currentFrame, position.x, position.y, bounds.width, bounds.height);
         }
     }
 
-    public void collect() {
-        active = false;
-        // TODO: 添加增加玩家阳光货币的逻辑
-        System.out.println("Sun collected!");
-    }
-
-    public boolean isActive() {
+    public boolean isActive () {
         return active;
     }
 
-    public Rectangle getBounds() {
+    public Rectangle getBounds () {
         return bounds;
     }
 
-    public Vector2 getPosition() {
+    public Vector2 getPosition () {
         return position;
+    }
+
+    public int getValue () {
+        return value;
     }
 }
