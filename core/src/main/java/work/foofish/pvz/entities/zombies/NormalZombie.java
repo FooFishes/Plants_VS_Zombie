@@ -13,6 +13,7 @@ public class NormalZombie extends BaseZombie {
     private static final float WALK_SPEED = 19f;
     private static final int BITE_DAMAGE = 20;
     private static final float ATTACK_INTERVAL = 1.0f;
+    private static final float DRAW_SCALE = 0.9f;
 
     private final Animation<TextureRegion> walkAnimation;
     private final Animation<TextureRegion> attackAnimation;
@@ -26,7 +27,7 @@ public class NormalZombie extends BaseZombie {
     private final float referenceWidth;
     private final float lostHeadWalkOffset;
     private final float lostHeadAttackOffset;
-    private static final float EXTRA_LOST_HEAD_OFFSET = 9f;
+    private static final float EXTRA_LOST_HEAD_OFFSET = 16f;
 
     public NormalZombie (GameScreen screen, float x, float y, int row) {
         this(screen, x, y, row, fetchReferenceFrame(screen));
@@ -34,9 +35,9 @@ public class NormalZombie extends BaseZombie {
 
     private NormalZombie (GameScreen screen, float x, float y, int row, TextureRegion referenceFrame) {
         super(screen, x, y, row, HEALTH,
-            getReferenceWidth(referenceFrame),
-            getReferenceHeight(referenceFrame));
-        this.referenceWidth = getReferenceWidth(referenceFrame);
+            getReferenceWidth(referenceFrame) * DRAW_SCALE,
+            getReferenceHeight(referenceFrame) * DRAW_SCALE);
+        this.referenceWidth = getReferenceWidth(referenceFrame) * DRAW_SCALE;
         TextureAtlas atlas = screen.getAssets().getAtlas(AssetPaths.ZOMBIES_ATLAS);
         this.walkAnimation = new Animation<>(0.09f, atlas.findRegions(AssetPaths.REGION_NORMAL_ZOMBIE_WALK), Animation.PlayMode.LOOP);
         this.attackAnimation = new Animation<>(0.09f, atlas.findRegions(AssetPaths.REGION_NORMAL_ATTACK), Animation.PlayMode.LOOP);
@@ -44,8 +45,8 @@ public class NormalZombie extends BaseZombie {
         this.lostHeadAttackAnimation = new Animation<>(0.09f, atlas.findRegions(AssetPaths.REGION_NORMAL_ZOMBIE_LOST_HEAD_ATTACK), Animation.PlayMode.NORMAL);
         this.dieAnimation = new Animation<>(0.08f, atlas.findRegions(AssetPaths.REGION_NORMAL_ZOMBIE_DIE), Animation.PlayMode.NORMAL);
         this.headAnimation = new Animation<>(0.08f, atlas.findRegions(AssetPaths.REGION_NORMAL_ZOMBIE_HEAD), Animation.PlayMode.NORMAL);
-        this.lostHeadWalkOffset = computeCenteringOffset(referenceWidth, lostHeadWalkAnimation);
-        this.lostHeadAttackOffset = computeCenteringOffset(referenceWidth, lostHeadAttackAnimation);
+        this.lostHeadWalkOffset = computeCenteringOffset(referenceWidth, lostHeadWalkAnimation, DRAW_SCALE);
+        this.lostHeadAttackOffset = computeCenteringOffset(referenceWidth, lostHeadAttackAnimation, DRAW_SCALE);
     }
 
     private static TextureRegion fetchReferenceFrame (GameScreen screen) {
@@ -111,11 +112,18 @@ public class NormalZombie extends BaseZombie {
     }
 
     @Override
+    protected float getDrawScale () {
+        return DRAW_SCALE;
+    }
+
+    @Override
     public void draw (SpriteBatch batch) {
         super.draw(batch);
         if (headAnimationActive && headAnimation != null) {
             TextureRegion frame = headAnimation.getKeyFrame(headAnimationTime, false);
-            batch.draw(frame, headPosition.x, headPosition.y);
+            float width = frame.getRegionWidth() * DRAW_SCALE;
+            float height = frame.getRegionHeight() * DRAW_SCALE;
+            batch.draw(frame, headPosition.x, headPosition.y, width, height);
         }
     }
 
@@ -135,16 +143,18 @@ public class NormalZombie extends BaseZombie {
         headAnimationActive = true;
         headAnimationTime = 0f;
         TextureRegion frame = headAnimation.getKeyFrame(0f, false);
-        float offsetX = (bounds.width - frame.getRegionWidth()) / 2f;
+        float scaledWidth = frame.getRegionWidth() * DRAW_SCALE;
+        float offsetX = (bounds.width - scaledWidth) / 2f;
         headPosition.set(position.x + offsetX, position.y);
     }
 
-    private static float computeCenteringOffset (float referenceWidth, Animation<TextureRegion> animation) {
+    private static float computeCenteringOffset (float referenceWidth, Animation<TextureRegion> animation, float scale) {
         if (animation == null || animation.getKeyFrames().length == 0) {
             return 0f;
         }
         TextureRegion firstFrame = animation.getKeyFrames()[0];
-        return (referenceWidth - firstFrame.getRegionWidth()) / 2f;
+        float scaledFrameWidth = firstFrame.getRegionWidth() * scale;
+        return (referenceWidth - scaledFrameWidth) / 2f;
     }
 
     private static float getReferenceWidth (TextureRegion referenceFrame) {

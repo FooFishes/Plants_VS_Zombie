@@ -18,6 +18,7 @@ import work.foofish.pvz.entities.Sun;
 import work.foofish.pvz.entities.bullets.PeaBullet;
 import work.foofish.pvz.entities.plants.BasePlant;
 import work.foofish.pvz.entities.plants.Peashooter;
+import work.foofish.pvz.entities.plants.RepeaterPea;
 import work.foofish.pvz.entities.plants.Sunflower;
 import work.foofish.pvz.entities.zombies.BaseZombie;
 import work.foofish.pvz.entities.zombies.NormalZombie;
@@ -124,9 +125,11 @@ public class GameScreen implements Screen, InputProcessor {
         TextureAtlas plantsAtlas = this.assets.getAtlas(AssetPaths.PLANTS_ATLAS);
         TextureRegion sunflowerGhost = null;
         TextureRegion peashooterGhost = null;
+        TextureRegion repeaterGhost = null;
         if (plantsAtlas != null) {
             sunflowerGhost = plantsAtlas.findRegion(AssetPaths.REGION_SUNFLOWER_NORMAL);
             peashooterGhost = plantsAtlas.findRegion(AssetPaths.REGION_PEASHOOTER);
+            repeaterGhost = plantsAtlas.findRegion(AssetPaths.REGION_REPEATERPEA);
         }
 
         // Initialize Seed Cards
@@ -148,6 +151,15 @@ public class GameScreen implements Screen, InputProcessor {
                 -3f,
                 "Peashooter",
                 (screen, cell, row, col) -> new Peashooter(screen, cell.x, cell.y, row, col)
+            ));
+            seedCards.add(new SeedCard(
+                cardAtlas.findRegion(AssetPaths.REGION_CARD_REPEATERPEA),
+                repeaterGhost,
+                200,
+                7.5f,
+                -3f,
+                "RepeaterPea",
+                (screen, cell, row, col) -> new RepeaterPea(screen, cell.x, cell.y, row, col)
             ));
         }
 
@@ -385,10 +397,11 @@ public class GameScreen implements Screen, InputProcessor {
 
         float originalHeight = chooserBackground != null ? chooserBackground.getRegionHeight() : 87f;
         float originalWidth = chooserBackground != null ? chooserBackground.getRegionWidth() : 450f;
+        float chooserScale = 0.85f;
 
-        float newHeight = originalHeight + 10f;
-        float scale = newHeight / originalHeight;
-        float newWidth = originalWidth * scale;
+        float newHeight = originalHeight * chooserScale;
+        float scale = chooserScale;
+        float newWidth = originalWidth * chooserScale;
 
         float chooserY = VIEW_HEIGHT - newHeight; // 顶部对齐
 

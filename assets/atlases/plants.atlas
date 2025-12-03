@@ -3,55 +3,100 @@ plants.png
 	repeat: none
 peashooter
 	index: 3
-	bounds: 827, 5, 71, 71
+	bounds: 1202, 11, 71, 71
 peashooter
 	index: 11
-	bounds: 902, 81, 71, 71
+	bounds: 1277, 84, 71, 71
 peashooter
 	index: 8
-	bounds: 977, 157, 71, 71
+	bounds: 1352, 157, 71, 71
 peashooter
 	index: 0
-	bounds: 1050, 157, 71, 71
+	bounds: 1275, 11, 71, 71
 peashooter
 	index: 5
-	bounds: 1123, 157, 71, 71
+	bounds: 1350, 84, 71, 71
 peashooter
 	index: 2
-	bounds: 1196, 157, 71, 71
+	bounds: 1425, 157, 71, 71
 peashooter
 	index: 10
-	bounds: 1269, 157, 71, 71
+	bounds: 1348, 11, 71, 71
 peashooter
 	index: 7
-	bounds: 1342, 157, 71, 71
+	bounds: 1423, 84, 71, 71
 peashooter
 	index: 4
-	bounds: 1415, 157, 71, 71
+	bounds: 1498, 157, 71, 71
 peashooter
 	index: 12
-	bounds: 1488, 157, 71, 71
+	bounds: 1421, 11, 71, 71
 peashooter
 	index: 9
-	bounds: 1561, 157, 71, 71
+	bounds: 1496, 84, 71, 71
 peashooter
 	index: 1
-	bounds: 1634, 157, 71, 71
+	bounds: 1571, 157, 71, 71
 peashooter
 	index: 6
-	bounds: 1707, 157, 71, 71
-sunflower_active
+	bounds: 1494, 11, 71, 71
+repeaterpea
+	index: 6
+	bounds: 827, 5, 73, 71
+repeaterpea
+	index: 10
+	bounds: 902, 81, 73, 71
+repeaterpea
+	index: 3
+	bounds: 977, 157, 73, 71
+repeaterpea
+	index: 8
+	bounds: 902, 8, 73, 71
+repeaterpea
+	index: 12
+	bounds: 977, 84, 73, 71
+repeaterpea
+	index: 0
+	bounds: 1052, 157, 73, 71
+repeaterpea
+	index: 5
+	bounds: 977, 11, 73, 71
+repeaterpea
+	index: 14
+	bounds: 1052, 84, 73, 71
+repeaterpea
+	index: 2
+	bounds: 1127, 157, 73, 71
+repeaterpea
+	index: 7
+	bounds: 1052, 11, 73, 71
+repeaterpea
+	index: 11
+	bounds: 1127, 84, 73, 71
+repeaterpea
+	index: 4
+	bounds: 1202, 157, 73, 71
+repeaterpea
+	index: 9
+	bounds: 1127, 11, 73, 71
+repeaterpea
 	index: 1
-	bounds: 77, 154, 73, 74
+	bounds: 1202, 84, 73, 71
+repeaterpea
+	index: 13
+	bounds: 1277, 157, 73, 71
 sunflower_active
 	index: 9
-	bounds: 77, 78, 73, 74
+	bounds: 2, 78, 73, 74
+sunflower_active
+	index: 1
+	bounds: 2, 2, 73, 74
 sunflower_active
 	index: 14
-	bounds: 152, 154, 73, 74
+	bounds: 77, 78, 73, 74
 sunflower_active
 	index: 6
-	bounds: 227, 154, 73, 74
+	bounds: 152, 78, 73, 74
 sunflower_active
 	index: 11
 	bounds: 152, 2, 73, 74
@@ -60,16 +105,16 @@ sunflower_active
 	bounds: 302, 154, 73, 74
 sunflower_active
 	index: 16
-	bounds: 302, 78, 73, 74
-sunflower_active
-	index: 0
-	bounds: 377, 78, 73, 74
+	bounds: 227, 2, 73, 74
 sunflower_active
 	index: 8
+	bounds: 302, 2, 73, 74
+sunflower_active
+	index: 0
 	bounds: 452, 154, 73, 74
 sunflower_active
 	index: 13
-	bounds: 452, 78, 73, 74
+	bounds: 377, 2, 73, 74
 sunflower_active
 	index: 5
 	bounds: 527, 154, 73, 74
@@ -84,46 +129,46 @@ sunflower_active
 	bounds: 677, 154, 73, 74
 sunflower_active
 	index: 7
-	bounds: 677, 2, 73, 74
+	bounds: 752, 154, 73, 74
 sunflower_active
 	index: 12
-	bounds: 827, 154, 73, 74
+	bounds: 752, 78, 73, 74
 sunflower_active
 	index: 4
 	bounds: 752, 2, 73, 74
 sunflower_active
 	index: 17
-	bounds: 902, 154, 73, 74
+	bounds: 827, 78, 73, 74
 sunflower_normal
 	index: 3
 	bounds: 2, 154, 73, 74
 sunflower_normal
 	index: 16
-	bounds: 2, 78, 73, 74
+	bounds: 77, 154, 73, 74
 sunflower_normal
 	index: 8
-	bounds: 2, 2, 73, 74
+	bounds: 152, 154, 73, 74
 sunflower_normal
 	index: 0
 	bounds: 77, 2, 73, 74
 sunflower_normal
 	index: 13
-	bounds: 152, 78, 73, 74
+	bounds: 227, 154, 73, 74
 sunflower_normal
 	index: 5
 	bounds: 227, 78, 73, 74
 sunflower_normal
 	index: 10
-	bounds: 227, 2, 73, 74
+	bounds: 302, 78, 73, 74
 sunflower_normal
 	index: 2
 	bounds: 377, 154, 73, 74
 sunflower_normal
 	index: 15
-	bounds: 302, 2, 73, 74
+	bounds: 377, 78, 73, 74
 sunflower_normal
 	index: 7
-	bounds: 377, 2, 73, 74
+	bounds: 452, 78, 73, 74
 sunflower_normal
 	index: 12
 	bounds: 452, 2, 73, 74
@@ -141,10 +186,10 @@ sunflower_normal
 	bounds: 677, 78, 73, 74
 sunflower_normal
 	index: 14
-	bounds: 752, 154, 73, 74
+	bounds: 677, 2, 73, 74
 sunflower_normal
 	index: 6
-	bounds: 752, 78, 73, 74
+	bounds: 827, 154, 73, 74
 sunflower_normal
 	index: 11
-	bounds: 827, 78, 73, 74
+	bounds: 902, 154, 73, 74

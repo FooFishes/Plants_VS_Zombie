@@ -143,8 +143,11 @@ public abstract class BaseZombie {
         if (state == ZombieState.DEAD) return;
         Animation<TextureRegion> animation = getAnimation(state);
         TextureRegion frame = animation.getKeyFrame(stateTime, isLooping(state));
+        float scale = getDrawScale();
+        float width = frame.getRegionWidth() * scale;
+        float height = frame.getRegionHeight() * scale;
         float drawX = position.x + getDrawOffsetX();
-        batch.draw(frame, drawX, position.y);
+        batch.draw(frame, drawX, position.y, width, height);
     }
 
     /**
@@ -154,6 +157,13 @@ public abstract class BaseZombie {
      */
     protected float getDrawOffsetX () {
         return 0f;
+    }
+
+    /**
+     * @return 绘制缩放系数，默认1表示原始大小
+     */
+    protected float getDrawScale () {
+        return 1f;
     }
 
     private boolean isLooping (ZombieState currentState) {
