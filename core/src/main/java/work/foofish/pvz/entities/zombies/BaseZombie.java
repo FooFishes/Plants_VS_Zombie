@@ -1,6 +1,7 @@
 package work.foofish.pvz.entities.zombies;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -28,6 +29,9 @@ public abstract class BaseZombie {
     private static final float LOST_HEAD_DURATION = 1.0f; // 掉头后存活1秒
     private float lostHeadTimer = 0f; // 掉头后的计时器
     private static final Color SLOW_OVERLAY_COLOR = new Color(0.1f, 0.45f, 0.95f, 0.7f);
+    private static final Color HIT_FLASH_COLOR = new Color(1f, 1f, 1f, 1f);
+    private static final float HIT_FLASH_DURATION = 0.18f;
+    private float hitFlashTimer = 0f;
     private float speedMultiplier = 1f;
     private final float speedVariation; // per-zombie random multiplier so synced spawns drift apart
     private float slowTimer = 0f;
@@ -88,6 +92,8 @@ public abstract class BaseZombie {
         if (position.x + bounds.width < 0f) {
             alive = false;
         }
+
+        updateHitFlashTimer(delta);
     }
 
     private void moveForward (float delta) {
@@ -132,6 +138,7 @@ public abstract class BaseZombie {
     private void applyDamage (int damage, ZombieState deathState) {
         if (!alive || state == ZombieState.DEAD) return;
         health -= damage;
+        hitFlashTimer = HIT_FLASH_DURATION;
         if (health <= 0) {
             health = 0;
             triggerDeath(deathState);
@@ -183,6 +190,24 @@ public abstract class BaseZombie {
         float height = frame.getRegionHeight() * scale;
         float drawX = position.x + getDrawOffsetX();
         batch.draw(frame, drawX, position.y, width, height);
+        if (isHitFlashing()) {
+            float flashStrength = MathUtils.clamp(hitFlashTimer / HIT_FLASH_DURATION, 0f, 1f);
+            float flashAlpha = MathUtils.lerp(0.2f, 0.55f, flashStrength);
+            Color currentColor = batch.getColor();
+            float originalR = currentColor.r;
+            float originalG = currentColor.g;
+            float originalB = currentColor.b;
+            float originalA = currentColor.a;
+            int oldSrcFunc = batch.getBlendSrcFunc();
+            int oldDstFunc = batch.getBlendDstFunc();
+            batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+            HIT_FLASH_COLOR.a = flashAlpha;
+            batch.setColor(HIT_FLASH_COLOR);
+            batch.draw(frame, drawX, position.y, width, height);
+            batch.setBlendFunction(oldSrcFunc, oldDstFunc);
+            HIT_FLASH_COLOR.a = 1f;
+            batch.setColor(originalR, originalG, originalB, originalA);
+        }
         if (isSlowed()) {
             Color currentColor = batch.getColor();
             float originalR = currentColor.r;
@@ -274,6 +299,21 @@ public abstract class BaseZombie {
             speedMultiplier = 1f;
             slowDuration = 0f;
         }
+    }
+
+    private void updateHitFlashTimer (float delta) {
+        if (hitFlashTimer <= 0f) {
+            hitFlashTimer = 0f;
+            return;
+        }
+        hitFlashTimer -= delta;
+        if (hitFlashTimer < 0f) {
+            hitFlashTimer = 0f;
+        }
+    }
+
+    private boolean isHitFlashing () {
+        return hitFlashTimer > 0f;
     }
 
     protected abstract float getWalkSpeed ();

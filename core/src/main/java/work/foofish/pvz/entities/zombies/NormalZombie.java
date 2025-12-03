@@ -37,11 +37,11 @@ public class NormalZombie extends BaseZombie {
 
     private NormalZombie (GameScreen screen, float x, float y, int row, TextureRegion referenceFrame) {
         super(screen, x, y, row, HEALTH,
-            getReferenceWidth(referenceFrame) * DRAW_SCALE,
-            getReferenceHeight(referenceFrame) * DRAW_SCALE);
-        this.referenceWidth = getReferenceWidth(referenceFrame) * DRAW_SCALE;
+            ZombieAnimationHelper.getReferenceWidth(referenceFrame, 70f) * DRAW_SCALE,
+            ZombieAnimationHelper.getReferenceHeight(referenceFrame, 90f) * DRAW_SCALE);
+        this.referenceWidth = ZombieAnimationHelper.getReferenceWidth(referenceFrame, 70f) * DRAW_SCALE;
         TextureAtlas atlas = screen.getAssets().getAtlas(AssetPaths.ZOMBIES_ATLAS);
-        this.walkAnimation = ensureAnimation(
+        this.walkAnimation = ZombieAnimationHelper.ensureAnimation(
             atlas,
             AssetPaths.REGION_NORMAL_ZOMBIE_WALK,
             0.09f,
@@ -49,7 +49,7 @@ public class NormalZombie extends BaseZombie {
             null,
             referenceFrame
         );
-        this.attackAnimation = ensureAnimation(
+        this.attackAnimation = ZombieAnimationHelper.ensureAnimation(
             atlas,
             AssetPaths.REGION_NORMAL_ATTACK,
             0.09f,
@@ -57,7 +57,7 @@ public class NormalZombie extends BaseZombie {
             walkAnimation,
             referenceFrame
         );
-        this.lostHeadWalkAnimation = ensureAnimation(
+        this.lostHeadWalkAnimation = ZombieAnimationHelper.ensureAnimation(
             atlas,
             AssetPaths.REGION_NORMAL_ZOMBIE_LOST_HEAD,
             0.09f,
@@ -65,7 +65,7 @@ public class NormalZombie extends BaseZombie {
             walkAnimation,
             referenceFrame
         );
-        this.lostHeadAttackAnimation = ensureAnimation(
+        this.lostHeadAttackAnimation = ZombieAnimationHelper.ensureAnimation(
             atlas,
             AssetPaths.REGION_NORMAL_ZOMBIE_LOST_HEAD_ATTACK,
             0.09f,
@@ -73,7 +73,7 @@ public class NormalZombie extends BaseZombie {
             attackAnimation,
             referenceFrame
         );
-        this.dieAnimation = ensureAnimation(
+        this.dieAnimation = ZombieAnimationHelper.ensureAnimation(
             atlas,
             AssetPaths.REGION_NORMAL_ZOMBIE_DIE,
             0.08f,
@@ -81,7 +81,7 @@ public class NormalZombie extends BaseZombie {
             walkAnimation,
             referenceFrame
         );
-        this.headAnimation = ensureAnimation(
+        this.headAnimation = ZombieAnimationHelper.ensureAnimation(
             atlas,
             AssetPaths.REGION_NORMAL_ZOMBIE_HEAD,
             0.08f,
@@ -89,7 +89,7 @@ public class NormalZombie extends BaseZombie {
             null,
             null
         );
-        this.boomDieAnimation = ensureAnimation(
+        this.boomDieAnimation = ZombieAnimationHelper.ensureAnimation(
             atlas,
             AssetPaths.REGION_NORMAL_ZOMBIE_BOOM_DIE,
             0.08f,
@@ -97,8 +97,8 @@ public class NormalZombie extends BaseZombie {
             dieAnimation,
             referenceFrame
         );
-        this.lostHeadWalkOffset = computeCenteringOffset(referenceWidth, lostHeadWalkAnimation, DRAW_SCALE);
-        this.lostHeadAttackOffset = computeCenteringOffset(referenceWidth, lostHeadAttackAnimation, DRAW_SCALE);
+        this.lostHeadWalkOffset = ZombieAnimationHelper.computeCenteringOffset(referenceWidth, lostHeadWalkAnimation, DRAW_SCALE);
+        this.lostHeadAttackOffset = ZombieAnimationHelper.computeCenteringOffset(referenceWidth, lostHeadAttackAnimation, DRAW_SCALE);
     }
 
     private static TextureRegion fetchReferenceFrame (GameScreen screen) {
@@ -202,61 +202,4 @@ public class NormalZombie extends BaseZombie {
         headPosition.set(position.x + offsetX, position.y);
     }
 
-    private static float computeCenteringOffset (float referenceWidth, Animation<TextureRegion> animation, float scale) {
-        if (animation == null || animation.getKeyFrames().length == 0) {
-            return 0f;
-        }
-        TextureRegion firstFrame = animation.getKeyFrames()[0];
-        float scaledFrameWidth = firstFrame.getRegionWidth() * scale;
-        return (referenceWidth - scaledFrameWidth) / 2f;
-    }
-
-    private static Animation<TextureRegion> ensureAnimation (TextureAtlas atlas,
-                                                             String regionName,
-                                                             float frameDuration,
-                                                             Animation.PlayMode playMode,
-                                                             Animation<TextureRegion> fallbackAnimation,
-                                                             TextureRegion fallbackFrame) {
-        Animation<TextureRegion> animation = createAnimation(atlas, regionName, frameDuration, playMode);
-        if (animation != null) {
-            return animation;
-        }
-        if (fallbackAnimation != null) {
-            return fallbackAnimation;
-        }
-        if (fallbackFrame != null) {
-            Animation<TextureRegion> single = new Animation<>(frameDuration, fallbackFrame);
-            single.setPlayMode(playMode);
-            return single;
-        }
-        return null;
-    }
-
-    private static Animation<TextureRegion> createAnimation (TextureAtlas atlas,
-                                                             String regionName,
-                                                             float frameDuration,
-                                                             Animation.PlayMode playMode) {
-        if (atlas == null) {
-            return null;
-        }
-        Array<TextureAtlas.AtlasRegion> regions = atlas.findRegions(regionName);
-        if (regions != null && regions.size > 0) {
-            return new Animation<>(frameDuration, regions, playMode);
-        }
-        TextureAtlas.AtlasRegion singleRegion = atlas.findRegion(regionName);
-        if (singleRegion != null) {
-            Animation<TextureRegion> animation = new Animation<>(frameDuration, singleRegion);
-            animation.setPlayMode(playMode);
-            return animation;
-        }
-        return null;
-    }
-
-    private static float getReferenceWidth (TextureRegion referenceFrame) {
-        return referenceFrame != null ? referenceFrame.getRegionWidth() : 70f;
-    }
-
-    private static float getReferenceHeight (TextureRegion referenceFrame) {
-        return referenceFrame != null ? referenceFrame.getRegionHeight() : 90f;
-    }
 }
