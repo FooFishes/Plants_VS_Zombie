@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import work.foofish.pvz.AssetService;
 import work.foofish.pvz.PvzGame;
+import work.foofish.pvz.entities.LawnMower;
 import work.foofish.pvz.entities.Sun;
 import work.foofish.pvz.entities.bullets.PeaBullet;
 import work.foofish.pvz.entities.plants.BasePlant;
@@ -76,6 +77,7 @@ public class GameScreen implements Screen, InputProcessor {
     private final List<PeaBullet> bullets = new ArrayList<>();
     private final List<BaseZombie> zombies = new ArrayList<>();
     private final List<BaseZombie> zombiesView = Collections.unmodifiableList(zombies);
+    private final List<LawnMower> lawnMowers = new ArrayList<>();
 
     // Plant Selection
     private final TextureAtlas cardAtlas;
@@ -120,6 +122,7 @@ public class GameScreen implements Screen, InputProcessor {
         // 加载UI图集中的chooser背景
         TextureAtlas uiAtlasForChooser = this.assets.getAtlas(AssetPaths.UI_ATLAS);
         this.chooserBackground = uiAtlasForChooser.findRegion(AssetPaths.REGION_CHOOSER);
+        TextureRegion lawnMowerRegion = uiAtlasForChooser != null ? uiAtlasForChooser.findRegion(AssetPaths.REGION_CAR) : null;
 
         // Load Card Atlas and Plant Atlas for Ghost
         this.cardAtlas = this.assets.getAtlas(AssetPaths.CARD_ATLAS);
@@ -184,6 +187,7 @@ public class GameScreen implements Screen, InputProcessor {
         this.font.getData().setScale(1.0f); // 略微缩小阳光字体
 
         initGrid();
+        initLawnMowers(lawnMowerRegion);
         // Removed default sunflower adding to allow player to plant
         // for (int i = 0; i < 5; i++) {
         //     addPlant(new Sunflower(this, grid[i][i].x, grid[i][i].y));
@@ -349,6 +353,14 @@ public class GameScreen implements Screen, InputProcessor {
             }
         }
 
+        for (int i = lawnMowers.size() - 1; i >= 0; i--) {
+            LawnMower mower = lawnMowers.get(i);
+            mower.update(delta, zombies);
+            if (mower.isSpent()) {
+                lawnMowers.remove(i);
+            }
+        }
+
         for (int i = plants.size() - 1; i >= 0; i--) {
             BasePlant plant = plants.get(i);
             plant.update(delta);
@@ -379,6 +391,10 @@ public class GameScreen implements Screen, InputProcessor {
 
         if (mapBackground != null) {
             batch.draw(mapBackground, 0f, 0f, MAP_WIDTH, MAP_HEIGHT);
+        }
+
+        for (LawnMower mower : lawnMowers) {
+            mower.draw(batch);
         }
 
         for (BasePlant plant : plants) {
@@ -788,6 +804,24 @@ public class GameScreen implements Screen, InputProcessor {
                         row, col, x, x + CELL_WIDTH, y, y + CELL_HEIGHT));
                 }
             }
+        }
+    }
+
+    private void initLawnMowers (TextureRegion mowerRegion) {
+        lawnMowers.clear();
+        float textureWidth = mowerRegion != null ? mowerRegion.getRegionWidth() : 70f;
+        float textureHeight = mowerRegion != null ? mowerRegion.getRegionHeight() : 60f;
+        float offset = 25f;
+        for (int row = 0; row < GRID_ROWS; row++) {
+            Rectangle firstCell = grid[row][0];
+            float startX = firstCell.x - textureWidth - offset;
+            float startY;
+            if (mowerRegion != null) {
+                startY = firstCell.y + (firstCell.height - textureHeight) / 2f;
+            } else {
+                startY = firstCell.y + firstCell.height * 0.1f;
+            }
+            lawnMowers.add(new LawnMower(mowerRegion, startX, startY, row, MAP_WIDTH));
         }
     }
 
