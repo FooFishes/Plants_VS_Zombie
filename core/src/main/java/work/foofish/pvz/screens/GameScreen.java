@@ -88,6 +88,7 @@ public class GameScreen implements Screen, InputProcessor {
     private final List<SeedCard> seedCards = new ArrayList<>();
     private SeedCard selectedSeedCard = null;
     private final GhostPlacement ghostPlacement = new GhostPlacement();
+    private final ShovelTool shovel;
 
     private InputMultiplexer inputMultiplexer;
 
@@ -126,6 +127,8 @@ public class GameScreen implements Screen, InputProcessor {
         // 加载UI图集中的chooser背景
         TextureAtlas uiAtlasForChooser = this.assets.getAtlas(AssetPaths.UI_ATLAS);
         this.chooserBackground = uiAtlasForChooser.findRegion(AssetPaths.REGION_CHOOSER);
+        TextureRegion shovelRegion = uiAtlasForChooser != null ? uiAtlasForChooser.findRegion(AssetPaths.REGION_SHOVEL) : null;
+        this.shovel = new ShovelTool(shovelRegion);
         TextureRegion lawnMowerRegion = uiAtlasForChooser != null ? uiAtlasForChooser.findRegion(AssetPaths.REGION_CAR) : null;
 
         // Load Card Atlas and Plant Atlas for Ghost
@@ -343,6 +346,28 @@ public class GameScreen implements Screen, InputProcessor {
         return false;
     }
 
+    private BasePlant findPlantAtCell (int row, int col) {
+        for (BasePlant plant : plants) {
+            if (!plant.isAlive()) {
+                continue;
+            }
+            if (plant.getRow() == row && plant.getCol() == col) {
+                return plant;
+            }
+        }
+        return null;
+    }
+
+    private boolean removePlantAt (int row, int col) {
+        BasePlant plant = findPlantAtCell(row, col);
+        if (plant == null) {
+            return false;
+        }
+        plant.forceRemove();
+        plants.remove(plant);
+        return true;
+    }
+
     public List<BaseZombie> getZombies () {
         return zombiesView;
     }
@@ -527,6 +552,18 @@ public class GameScreen implements Screen, InputProcessor {
             batch.setColor(Color.WHITE);
         }
 
+        // 绘制铲子工具
+        float shovelSpacing = 18f * scale;
+        float shovelFrameWidth = cardWidth;
+        float shovelFrameHeight = cardHeight;
+        float shovelX = chooserX + newWidth + shovelSpacing;
+        float shovelY = chooserY + slotOffsetY;
+        shovel.setBounds(shovelX, shovelY, shovelFrameWidth, shovelFrameHeight);
+        batch.end();
+        drawShovelSlotFrame();
+        batch.begin();
+        shovel.draw(batch);
+
         // 更新并绘制飞行的阳光 (在 Chooser 之上)
         for (int i = flyingSuns.size() - 1; i >= 0; i--) {
             FlyingSun fs = flyingSuns.get(i);
@@ -591,6 +628,7 @@ public class GameScreen implements Screen, InputProcessor {
         }
 
         drawGhostPlant(batch);
+        drawShovelGhost(batch);
 
         batch.end();
 
@@ -624,6 +662,10 @@ public class GameScreen implements Screen, InputProcessor {
                 shapeRenderer.setColor(0f, 0f, 0f, 0.5f);
                 shapeRenderer.rect(card.x, overlayY, card.width, overlayHeight);
             }
+        }
+        if (shovel.isSelected()) {
+            shapeRenderer.setColor(1f, 1f, 1f, 0.2f);
+            shapeRenderer.rect(shovel.getX() - 2f, shovel.getY() - 2f, shovel.getWidth() + 4f, shovel.getHeight() + 4f);
         }
         shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
@@ -704,6 +746,43 @@ public class GameScreen implements Screen, InputProcessor {
         batch.end();
         batch.setProjectionMatrix(uiStage.getCamera().combined);
         batch.begin();
+    }
+
+    private void drawShovelGhost (SpriteBatch batch) {
+        if (!shovel.isSelected() || !shovel.hasTexture()) {
+            return;
+        }
+        tmpVec.set(Gdx.input.getX(), Gdx.input.getY(), 0f);
+        uiStage.getViewport().unproject(tmpVec);
+        shovel.drawGhost(batch, tmpVec.x, tmpVec.y);
+    }
+
+    private void drawShovelSlotFrame () {
+        if (shovel == null) {
+            return;
+        }
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        shapeRenderer.setProjectionMatrix(uiStage.getCamera().combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0.26f, 0.14f, 0.02f, 0.6f);
+        shapeRenderer.rect(shovel.getX(), shovel.getY(), shovel.getWidth(), shovel.getHeight());
+        shapeRenderer.end();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(0.82f, 0.52f, 0.13f, 1f);
+        int borderLayers = 2;
+        float insetStep = 1.5f;
+        for (int i = 0; i < borderLayers; i++) {
+            float inset = i * insetStep;
+            shapeRenderer.rect(
+                shovel.getX() + inset,
+                shovel.getY() + inset,
+                shovel.getWidth() - 2f * inset,
+                shovel.getHeight() - 2f * inset
+            );
+        }
+        shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 
     private GhostPlacement calculateGhostPlacement (TextureRegion ghostRegion) {
@@ -867,6 +946,7 @@ public class GameScreen implements Screen, InputProcessor {
         }
         if (keycode == Input.Keys.ESCAPE) {
             selectedSeedCard = null;
+            shovel.setSelected(false);
             return true;
         }
         return false;
@@ -935,6 +1015,16 @@ public class GameScreen implements Screen, InputProcessor {
         uiTouch.set(screenX, screenY, 0f);
         uiStage.getViewport().unproject(uiTouch);
 
+        if (shovel.contains(uiTouch.x, uiTouch.y)) {
+            if (shovel.isSelected()) {
+                shovel.setSelected(false);
+            } else {
+                selectedSeedCard = null;
+                shovel.setSelected(true);
+            }
+            return true;
+        }
+
         for (SeedCard card : seedCards) {
             if (!card.contains(uiTouch.x, uiTouch.y)) {
                 continue;
@@ -945,9 +1035,29 @@ public class GameScreen implements Screen, InputProcessor {
             }
             if (card.isSelectable(sunCount)) {
                 selectedSeedCard = card;
+                shovel.setSelected(false);
                 return true;
             }
             return true;
+        }
+
+        // Handle Shovel usage before planting logic
+        if (shovel.isSelected()) {
+            if (button == 1) { // Right mouse button cancels
+                shovel.setSelected(false);
+                return true;
+            }
+
+            for (int row = 0; row < GRID_ROWS; row++) {
+                for (int col = 0; col < GRID_COLS; col++) {
+                    Rectangle cell = grid[row][col];
+                    if (cell.contains(worldTouch.x, worldTouch.y)) {
+                        removePlantAt(row, col);
+                        shovel.setSelected(false);
+                        return true;
+                    }
+                }
+            }
         }
 
         // Handle Planting (World Coordinates)
@@ -1063,6 +1173,114 @@ public class GameScreen implements Screen, InputProcessor {
         INTRO,
         PLAY,
         OUTRO
+    }
+
+    private static class ShovelTool {
+        private final TextureRegion region;
+        private float x;
+        private float y;
+        private float width;
+        private float height;
+        private boolean selected;
+        private float iconWidth;
+        private float iconHeight;
+
+        ShovelTool (TextureRegion region) {
+            this.region = region;
+        }
+
+        void setBounds (float x, float y, float width, float height) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            recalcIconSize();
+        }
+
+        void draw (SpriteBatch batch) {
+            if (region == null || selected || iconWidth <= 0f || iconHeight <= 0f) {
+                return;
+            }
+            float drawX = x + (width - iconWidth) / 2f;
+            float drawY = y + (height - iconHeight) / 2f;
+            batch.draw(region, drawX, drawY, iconWidth, iconHeight);
+        }
+
+        void drawGhost (SpriteBatch batch, float centerX, float centerY) {
+            if (region == null) {
+                return;
+            }
+            float drawWidth = iconWidth > 0f ? iconWidth : width;
+            float drawHeight = iconHeight > 0f ? iconHeight : height;
+            float drawX = centerX - drawWidth / 2f;
+            float drawY = centerY - drawHeight / 2f;
+
+            Color color = batch.getColor();
+            float oldR = color.r;
+            float oldG = color.g;
+            float oldB = color.b;
+            float oldA = color.a;
+            batch.setColor(1f, 1f, 1f, 0.65f);
+            batch.draw(region, drawX, drawY, drawWidth, drawHeight);
+            batch.setColor(oldR, oldG, oldB, oldA);
+        }
+
+        boolean contains (float px, float py) {
+            return px >= x && px <= x + width && py >= y && py <= y + height;
+        }
+
+        boolean isSelected () {
+            return selected;
+        }
+
+        void setSelected (boolean selected) {
+            this.selected = selected;
+        }
+
+        float getX () {
+            return x;
+        }
+
+        float getY () {
+            return y;
+        }
+
+        float getWidth () {
+            return width;
+        }
+
+        float getHeight () {
+            return height;
+        }
+
+        boolean hasTexture () {
+            return region != null;
+        }
+
+        private void recalcIconSize () {
+            if (region == null || width <= 0f || height <= 0f) {
+                iconWidth = 0f;
+                iconHeight = 0f;
+                return;
+            }
+            float availableWidth = width * 0.8f;
+            float availableHeight = height * 0.8f;
+            float aspect = 1f;
+            if (region.getRegionHeight() > 0) {
+                aspect = (float) region.getRegionWidth() / region.getRegionHeight();
+                if (aspect <= 0f) {
+                    aspect = 1f;
+                }
+            }
+            float candidateHeight = availableHeight;
+            float candidateWidth = candidateHeight * aspect;
+            if (candidateWidth > availableWidth) {
+                candidateWidth = availableWidth;
+                candidateHeight = aspect != 0f ? candidateWidth / aspect : availableHeight;
+            }
+            iconWidth = candidateWidth;
+            iconHeight = candidateHeight;
+        }
     }
 
     private class ZombieSpawner {

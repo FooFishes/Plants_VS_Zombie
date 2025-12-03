@@ -81,4 +81,8 @@ public abstract class BasePlant {
     public int cost () {
         return cost;
     }
+
+    public void forceRemove () {
+        alive = false;
+    }
 }
