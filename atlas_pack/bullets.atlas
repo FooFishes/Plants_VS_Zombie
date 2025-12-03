@@ -1,0 +1,7 @@
+bullets.png
+	size: 128, 64
+	repeat: none
+pea_normal
+	bounds: 56, 14, 56, 34
+pea_normal_explode
+	bounds: 2, 2, 52, 46

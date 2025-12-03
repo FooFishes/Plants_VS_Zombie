@@ -1,0 +1,345 @@
+zombies.png
+	size: 2048, 2048
+	repeat: none
+normal_zombie_attack
+	index: 10
+	bounds: 610, 1818, 166, 144
+normal_zombie_attack
+	index: 2
+	bounds: 1618, 1818, 166, 144
+normal_zombie_attack
+	index: 15
+	bounds: 306, 1442, 166, 144
+normal_zombie_attack
+	index: 20
+	bounds: 2, 440, 166, 144
+normal_zombie_attack
+	index: 7
+	bounds: 2, 294, 166, 144
+normal_zombie_attack
+	index: 12
+	bounds: 1130, 1672, 166, 144
+normal_zombie_attack
+	index: 4
+	bounds: 474, 1484, 166, 144
+normal_zombie_attack
+	index: 17
+	bounds: 642, 1526, 166, 144
+normal_zombie_attack
+	index: 9
+	bounds: 810, 1380, 166, 144
+normal_zombie_attack
+	index: 1
+	bounds: 1314, 1380, 166, 144
+normal_zombie_attack
+	index: 14
+	bounds: 1482, 1380, 166, 144
+normal_zombie_attack
+	index: 6
+	bounds: 170, 628, 166, 144
+normal_zombie_attack
+	index: 19
+	bounds: 170, 336, 166, 144
+normal_zombie_attack
+	index: 11
+	bounds: 658, 1234, 166, 144
+normal_zombie_attack
+	index: 3
+	bounds: 1498, 1234, 166, 144
+normal_zombie_attack
+	index: 16
+	bounds: 1834, 1234, 166, 144
+normal_zombie_attack
+	index: 8
+	bounds: 338, 566, 166, 144
+normal_zombie_attack
+	index: 0
+	bounds: 506, 900, 166, 144
+normal_zombie_attack
+	index: 13
+	bounds: 506, 754, 166, 144
+normal_zombie_attack
+	index: 5
+	bounds: 842, 1088, 166, 144
+normal_zombie_attack
+	index: 18
+	bounds: 674, 796, 166, 144
+normal_zombie_boom_die
+	index: 15
+	bounds: 778, 1818, 166, 144
+normal_zombie_boom_die
+	index: 2
+	bounds: 1786, 1818, 166, 144
+normal_zombie_boom_die
+	index: 12
+	bounds: 2, 732, 166, 144
+normal_zombie_boom_die
+	index: 7
+	bounds: 2, 148, 166, 144
+normal_zombie_boom_die
+	index: 17
+	bounds: 962, 1672, 166, 144
+normal_zombie_boom_die
+	index: 4
+	bounds: 474, 1338, 166, 144
+normal_zombie_boom_die
+	index: 14
+	bounds: 810, 1526, 166, 144
+normal_zombie_boom_die
+	index: 9
+	bounds: 978, 1526, 166, 144
+normal_zombie_boom_die
+	index: 1
+	bounds: 1482, 1526, 166, 144
+normal_zombie_boom_die
+	index: 19
+	bounds: 1650, 1526, 166, 144
+normal_zombie_boom_die
+	index: 11
+	bounds: 1818, 1380, 166, 144
+normal_zombie_boom_die
+	index: 6
+	bounds: 170, 482, 166, 144
+normal_zombie_boom_die
+	index: 16
+	bounds: 490, 1192, 166, 144
+normal_zombie_boom_die
+	index: 3
+	bounds: 1666, 1234, 166, 144
+normal_zombie_boom_die
+	index: 5
+	bounds: 1666, 1234, 166, 144
+normal_zombie_boom_die
+	index: 0
+	bounds: 1666, 1234, 166, 144
+normal_zombie_boom_die
+	index: 13
+	bounds: 338, 712, 166, 144
+normal_zombie_boom_die
+	index: 8
+	bounds: 338, 420, 166, 144
+normal_zombie_boom_die
+	index: 18
+	bounds: 506, 608, 166, 144
+normal_zombie_boom_die
+	index: 10
+	bounds: 506, 170, 166, 144
+normal_zombie_die
+	index: 4
+	bounds: 1282, 1818, 166, 144
+normal_zombie_die
+	index: 9
+	bounds: 2, 586, 166, 144
+normal_zombie_die
+	index: 1
+	bounds: 626, 1672, 166, 144
+normal_zombie_die
+	index: 6
+	bounds: 1634, 1672, 166, 144
+normal_zombie_die
+	index: 3
+	bounds: 1146, 1380, 166, 144
+normal_zombie_die
+	index: 8
+	bounds: 170, 920, 166, 144
+normal_zombie_die
+	index: 0
+	bounds: 170, 44, 166, 144
+normal_zombie_die
+	index: 5
+	bounds: 1162, 1234, 166, 144
+normal_zombie_die
+	index: 2
+	bounds: 338, 128, 166, 144
+normal_zombie_die
+	index: 7
+	bounds: 674, 1088, 166, 144
+normal_zombie_head
+	index: 1
+	bounds: 2, 1776, 150, 186
+normal_zombie_head
+	index: 11
+	bounds: 2, 1588, 150, 186
+normal_zombie_head
+	index: 6
+	bounds: 154, 1776, 150, 186
+normal_zombie_head
+	index: 3
+	bounds: 2, 1400, 150, 186
+normal_zombie_head
+	index: 8
+	bounds: 154, 1588, 150, 186
+normal_zombie_head
+	index: 0
+	bounds: 306, 1776, 150, 186
+normal_zombie_head
+	index: 10
+	bounds: 2, 1212, 150, 186
+normal_zombie_head
+	index: 5
+	bounds: 154, 1400, 150, 186
+normal_zombie_head
+	index: 2
+	bounds: 306, 1588, 150, 186
+normal_zombie_head
+	index: 7
+	bounds: 458, 1776, 150, 186
+normal_zombie_head
+	index: 4
+	bounds: 2, 1024, 150, 186
+normal_zombie_head
+	index: 9
+	bounds: 154, 1212, 150, 186
+normal_zombie_lost_head
+	index: 3
+	bounds: 1010, 1104, 96, 128
+normal_zombie_lost_head
+	index: 16
+	bounds: 674, 666, 96, 128
+normal_zombie_lost_head
+	index: 8
+	bounds: 842, 812, 96, 128
+normal_zombie_lost_head
+	index: 0
+	bounds: 1010, 974, 96, 128
+normal_zombie_lost_head
+	index: 13
+	bounds: 1108, 1104, 96, 128
+normal_zombie_lost_head
+	index: 5
+	bounds: 674, 536, 96, 128
+normal_zombie_lost_head
+	index: 10
+	bounds: 1108, 974, 96, 128
+normal_zombie_lost_head
+	index: 2
+	bounds: 1206, 1104, 96, 128
+normal_zombie_lost_head
+	index: 15
+	bounds: 674, 406, 96, 128
+normal_zombie_lost_head
+	index: 7
+	bounds: 1206, 974, 96, 128
+normal_zombie_lost_head
+	index: 12
+	bounds: 1304, 1104, 96, 128
+normal_zombie_lost_head
+	index: 4
+	bounds: 674, 276, 96, 128
+normal_zombie_lost_head
+	index: 17
+	bounds: 1304, 974, 96, 128
+normal_zombie_lost_head
+	index: 9
+	bounds: 1402, 1104, 96, 128
+normal_zombie_lost_head
+	index: 1
+	bounds: 1402, 974, 96, 128
+normal_zombie_lost_head
+	index: 14
+	bounds: 1500, 1104, 96, 128
+normal_zombie_lost_head
+	index: 6
+	bounds: 1500, 974, 96, 128
+normal_zombie_lost_head
+	index: 11
+	bounds: 1598, 1104, 96, 128
+normal_zombie_lost_head_attack
+	index: 4
+	bounds: 1450, 1818, 166, 144
+normal_zombie_lost_head_attack
+	index: 9
+	bounds: 2, 2, 166, 144
+normal_zombie_lost_head_attack
+	index: 1
+	bounds: 794, 1672, 166, 144
+normal_zombie_lost_head_attack
+	index: 6
+	bounds: 1802, 1672, 166, 144
+normal_zombie_lost_head_attack
+	index: 3
+	bounds: 1314, 1526, 166, 144
+normal_zombie_lost_head_attack
+	index: 8
+	bounds: 170, 774, 166, 144
+normal_zombie_lost_head_attack
+	index: 0
+	bounds: 322, 1150, 166, 144
+normal_zombie_lost_head_attack
+	index: 5
+	bounds: 1330, 1234, 166, 144
+normal_zombie_lost_head_attack
+	index: 10
+	bounds: 338, 858, 166, 144
+normal_zombie_lost_head_attack
+	index: 2
+	bounds: 506, 1046, 166, 144
+normal_zombie_lost_head_attack
+	index: 7
+	bounds: 674, 942, 166, 144
+normal_zombie_walk
+	index: 3
+	bounds: 946, 1818, 166, 144
+normal_zombie_walk
+	index: 16
+	bounds: 1114, 1818, 166, 144
+normal_zombie_walk
+	index: 21
+	bounds: 306, 1296, 166, 144
+normal_zombie_walk
+	index: 8
+	bounds: 2, 878, 166, 144
+normal_zombie_walk
+	index: 0
+	bounds: 458, 1630, 166, 144
+normal_zombie_walk
+	index: 13
+	bounds: 154, 1066, 166, 144
+normal_zombie_walk
+	index: 5
+	bounds: 1298, 1672, 166, 144
+normal_zombie_walk
+	index: 18
+	bounds: 1466, 1672, 166, 144
+normal_zombie_walk
+	index: 10
+	bounds: 642, 1380, 166, 144
+normal_zombie_walk
+	index: 2
+	bounds: 978, 1380, 166, 144
+normal_zombie_walk
+	index: 15
+	bounds: 1146, 1526, 166, 144
+normal_zombie_walk
+	index: 14
+	bounds: 1146, 1526, 166, 144
+normal_zombie_walk
+	index: 20
+	bounds: 1650, 1380, 166, 144
+normal_zombie_walk
+	index: 7
+	bounds: 1818, 1526, 166, 144
+normal_zombie_walk
+	index: 12
+	bounds: 170, 190, 166, 144
+normal_zombie_walk
+	index: 4
+	bounds: 826, 1234, 166, 144
+normal_zombie_walk
+	index: 17
+	bounds: 994, 1234, 166, 144
+normal_zombie_walk
+	index: 9
+	bounds: 338, 1004, 166, 144
+normal_zombie_walk
+	index: 1
+	bounds: 338, 274, 166, 144
+normal_zombie_walk
+	index: 6
+	bounds: 506, 462, 166, 144
+normal_zombie_walk
+	index: 19
+	bounds: 506, 316, 166, 144
+normal_zombie_walk
+	index: 11
+	bounds: 842, 942, 166, 144
