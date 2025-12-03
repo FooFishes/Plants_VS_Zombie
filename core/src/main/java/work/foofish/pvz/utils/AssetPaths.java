@@ -16,8 +16,9 @@ public class AssetPaths {
     public static final String REGION_MAIN_MENU = "MainMenu";
     public static final String REGION_CHOOSER = "chooser";
     public static final String REGION_SUN = "sun";
-
+    public static final String REGION_BOOM = "Boom";
     public static final String REGION_CAR = "car";
+    public static final String REGION_SHOVEL = "shovel";
 
     // 卡片区域
     public static final String REGION_CARD_PEASHOOTER = "card_peashooter";
@@ -25,6 +26,7 @@ public class AssetPaths {
     public static final String REGION_CARD_SNOWPEA = "card_snowpea";
     public static final String REGION_CARD_SUNFLOWER = "card_sunflower";
     public static final String REGION_CARD_WALLNUT = "card_wallnut";
+    public static final String REGION_CARD_CHERRY_BOMB = "card_cherrybomb";
 
     // 植物区域
     public static final String REGION_PEASHOOTER = "peashooter";
@@ -35,6 +37,7 @@ public class AssetPaths {
     public static final String REGION_WALLNUT_NORMAL = "wallnut_normal";
     public static final String REGION_WALLNUT_CRACKED1 = "wallnut_cracked1";
     public static final String REGION_WALLNUT_CRACKED2 = "wallnut_cracked2";
+    public static final String REGION_CHERRY_BOMB = "cherry_bomb";
 
     // 子弹区域
     public static final String REGION_PEA_NORMAL = "pea_normal";
@@ -50,6 +53,8 @@ public class AssetPaths {
     public static final String REGION_NORMAL_ZOMBIE_LOST_HEAD = "normal_zombie_lost_head";
     public static final String REGION_NORMAL_ZOMBIE_LOST_HEAD_ATTACK = "normal_zombie_lost_head_attack";
     public static final String REGION_NORMAL_ZOMBIE_WALK = "normal_zombie_walk";
+    public static final String REGION_CONEHEAD_ZOMBIE_WALK = "conehead_zombie_walk";
+    public static final String REGION_CONEHEAD_ZOMBIE_ATTACK = "conehead_zombie_attack";
 
     // 字体
     // 如需要，在此添加字体路径

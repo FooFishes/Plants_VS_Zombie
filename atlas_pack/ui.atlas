@@ -1,104 +1,106 @@
 ui.png
 	size: 2048, 1024
 	repeat: none
+Boom
+	bounds: 1404, 846, 213, 160
 MainMenu
-	bounds: 2, 415, 900, 600
+	bounds: 2, 406, 900, 600
 ZombiesWon
-	bounds: 904, 576, 498, 439
+	bounds: 904, 567, 498, 439
 adventure_down
-	bounds: 1404, 945, 165, 70
+	bounds: 2, 245, 165, 70
 adventure_up
-	bounds: 904, 504, 166, 70
+	bounds: 904, 495, 166, 70
 car
-	bounds: 1072, 517, 71, 57
+	bounds: 1072, 508, 71, 57
 chooser
-	bounds: 2, 326, 522, 87
+	bounds: 2, 317, 522, 87
 shovel
-	bounds: 245, 88, 70, 74
+	bounds: 1647, 689, 70, 74
 sun
 	index: 11
-	bounds: 2, 245, 79, 79
+	bounds: 526, 325, 79, 79
 sun
 	index: 24
-	bounds: 526, 334, 79, 79
+	bounds: 1404, 765, 79, 79
 sun
 	index: 3
-	bounds: 904, 423, 79, 79
+	bounds: 1619, 927, 79, 79
 sun
 	index: 16
-	bounds: 1404, 864, 79, 79
+	bounds: 904, 414, 79, 79
 sun
 	index: 21
 	bounds: 2, 164, 79, 79
 sun
 	index: 8
-	bounds: 83, 245, 79, 79
+	bounds: 607, 325, 79, 79
 sun
 	index: 0
-	bounds: 607, 334, 79, 79
+	bounds: 1404, 684, 79, 79
 sun
 	index: 13
-	bounds: 985, 423, 79, 79
+	bounds: 1485, 765, 79, 79
 sun
 	index: 26
-	bounds: 1404, 783, 79, 79
+	bounds: 1619, 846, 79, 79
 sun
 	index: 5
-	bounds: 1485, 864, 79, 79
+	bounds: 1700, 927, 79, 79
 sun
 	index: 18
-	bounds: 2, 83, 79, 79
+	bounds: 985, 414, 79, 79
 sun
 	index: 10
-	bounds: 83, 164, 79, 79
+	bounds: 2, 83, 79, 79
 sun
 	index: 23
-	bounds: 164, 245, 79, 79
+	bounds: 83, 164, 79, 79
 sun
 	index: 2
-	bounds: 688, 334, 79, 79
+	bounds: 688, 325, 79, 79
 sun
 	index: 15
-	bounds: 1404, 702, 79, 79
+	bounds: 1404, 603, 79, 79
 sun
 	index: 28
-	bounds: 1485, 783, 79, 79
+	bounds: 1485, 684, 79, 79
 sun
 	index: 7
-	bounds: 2, 2, 79, 79
+	bounds: 1566, 765, 79, 79
 sun
 	index: 20
-	bounds: 83, 83, 79, 79
+	bounds: 1700, 846, 79, 79
 sun
 	index: 12
-	bounds: 164, 164, 79, 79
+	bounds: 1781, 927, 79, 79
 sun
 	index: 25
-	bounds: 245, 245, 79, 79
+	bounds: 2, 2, 79, 79
 sun
 	index: 4
-	bounds: 769, 334, 79, 79
+	bounds: 83, 83, 79, 79
 sun
 	index: 17
-	bounds: 1404, 621, 79, 79
+	bounds: 769, 325, 79, 79
 sun
 	index: 9
-	bounds: 1485, 702, 79, 79
+	bounds: 1485, 603, 79, 79
 sun
 	index: 22
-	bounds: 83, 2, 79, 79
+	bounds: 1566, 684, 79, 79
 sun
 	index: 1
-	bounds: 164, 83, 79, 79
+	bounds: 1647, 765, 79, 79
 sun
 	index: 14
-	bounds: 245, 164, 79, 79
+	bounds: 1781, 846, 79, 79
 sun
 	index: 27
-	bounds: 326, 245, 79, 79
+	bounds: 1862, 927, 79, 79
 sun
 	index: 6
-	bounds: 1485, 621, 79, 79
+	bounds: 83, 2, 79, 79
 sun
 	index: 19
-	bounds: 164, 2, 79, 79
+	bounds: 1566, 603, 79, 79
