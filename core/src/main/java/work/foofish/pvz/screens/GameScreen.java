@@ -22,6 +22,7 @@ import work.foofish.pvz.entities.plants.Peashooter;
 import work.foofish.pvz.entities.plants.RepeaterPea;
 import work.foofish.pvz.entities.plants.SnowPea;
 import work.foofish.pvz.entities.plants.Sunflower;
+import work.foofish.pvz.entities.plants.Wallnut;
 import work.foofish.pvz.entities.zombies.BaseZombie;
 import work.foofish.pvz.entities.zombies.NormalZombie;
 import work.foofish.pvz.utils.AssetPaths;
@@ -131,13 +132,18 @@ public class GameScreen implements Screen, InputProcessor {
         TextureRegion peashooterGhost = null;
         TextureRegion repeaterGhost = null;
         TextureRegion snowPeaGhost = null;
+        TextureRegion wallnutGhost = null;
         if (plantsAtlas != null) {
             sunflowerGhost = plantsAtlas.findRegion(AssetPaths.REGION_SUNFLOWER_NORMAL);
             peashooterGhost = plantsAtlas.findRegion(AssetPaths.REGION_PEASHOOTER);
             repeaterGhost = plantsAtlas.findRegion(AssetPaths.REGION_REPEATERPEA);
             snowPeaGhost = plantsAtlas.findRegion(AssetPaths.REGION_SNOWPEA);
+            wallnutGhost = plantsAtlas.findRegion(AssetPaths.REGION_WALLNUT_NORMAL);
             if (snowPeaGhost == null) {
                 snowPeaGhost = peashooterGhost;
+            }
+            if (wallnutGhost == null) {
+                wallnutGhost = peashooterGhost;
             }
         }
 
@@ -151,6 +157,15 @@ public class GameScreen implements Screen, InputProcessor {
                 -5f,
                 "Sunflower",
                 (screen, cell, row, col) -> new Sunflower(screen, cell.x, cell.y, row, col)
+            ));
+            seedCards.add(new SeedCard(
+                cardAtlas.findRegion(AssetPaths.REGION_CARD_WALLNUT),
+                wallnutGhost,
+                50,
+                15f,
+                -7f,
+                "Wallnut",
+                (screen, cell, row, col) -> new Wallnut(screen, cell.x, cell.y, row, col)
             ));
             seedCards.add(new SeedCard(
                 cardAtlas.findRegion(AssetPaths.REGION_CARD_PEASHOOTER),

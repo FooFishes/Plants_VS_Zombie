@@ -29,6 +29,7 @@ public abstract class BaseZombie {
     private float lostHeadTimer = 0f; // 掉头后的计时器
     private static final Color SLOW_OVERLAY_COLOR = new Color(0.1f, 0.45f, 0.95f, 0.7f);
     private float speedMultiplier = 1f;
+    private final float speedVariation; // per-zombie random multiplier so synced spawns drift apart
     private float slowTimer = 0f;
     private float slowDuration = 0f;
 
@@ -40,6 +41,7 @@ public abstract class BaseZombie {
         this.health = maxHealth;
         this.bounds = new Rectangle(position.x, position.y, width, height);
         this.collisionBounds = new Rectangle(bounds);
+        this.speedVariation = MathUtils.random(0.95f, 1.05f);
     }
 
     public void update (float delta) {
@@ -233,7 +235,7 @@ public abstract class BaseZombie {
     }
 
     private float getMovementMultiplier () {
-        return speedMultiplier;
+        return speedMultiplier * speedVariation;
     }
 
     private void updateSlowState (float delta) {

@@ -24,6 +24,7 @@ public class AssetPaths {
     public static final String REGION_CARD_REPEATERPEA = "card_repeaterpea";
     public static final String REGION_CARD_SNOWPEA = "card_snowpea";
     public static final String REGION_CARD_SUNFLOWER = "card_sunflower";
+    public static final String REGION_CARD_WALLNUT = "card_wallnut";
 
     // 植物区域
     public static final String REGION_PEASHOOTER = "peashooter";
@@ -31,6 +32,9 @@ public class AssetPaths {
     public static final String REGION_REPEATERPEA = "repeaterpea";
     public static final String REGION_SUNFLOWER_ACTIVE = "sunflower_active";
     public static final String REGION_SUNFLOWER_NORMAL = "sunflower_normal";
+    public static final String REGION_WALLNUT_NORMAL = "wallnut_normal";
+    public static final String REGION_WALLNUT_CRACKED1 = "wallnut_cracked1";
+    public static final String REGION_WALLNUT_CRACKED2 = "wallnut_cracked2";
 
     // 子弹区域
     public static final String REGION_PEA_NORMAL = "pea_normal";
