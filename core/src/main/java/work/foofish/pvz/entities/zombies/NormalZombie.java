@@ -27,7 +27,7 @@ public class NormalZombie extends BaseZombie {
     private final float referenceWidth;
     private final float lostHeadWalkOffset;
     private final float lostHeadAttackOffset;
-    private static final float EXTRA_LOST_HEAD_OFFSET = 16f;
+    private static final float EXTRA_LOST_HEAD_OFFSET = 25f;
 
     public NormalZombie (GameScreen screen, float x, float y, int row) {
         this(screen, x, y, row, fetchReferenceFrame(screen));

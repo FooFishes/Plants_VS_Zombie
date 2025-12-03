@@ -1,10 +1,12 @@
 package work.foofish.pvz.entities.zombies;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.MathUtils;
 import work.foofish.pvz.entities.plants.BasePlant;
 import work.foofish.pvz.screens.GameScreen;
 
@@ -25,6 +27,10 @@ public abstract class BaseZombie {
     private static final float CENTER_COLLISION_WIDTH = 10f;
     private static final float LOST_HEAD_DURATION = 1.0f; // 掉头后存活1秒
     private float lostHeadTimer = 0f; // 掉头后的计时器
+    private static final Color SLOW_OVERLAY_COLOR = new Color(0.1f, 0.45f, 0.95f, 0.7f);
+    private float speedMultiplier = 1f;
+    private float slowTimer = 0f;
+    private float slowDuration = 0f;
 
     protected BaseZombie (GameScreen screen, float x, float y, int row, int maxHealth, float width, float height) {
         this.screen = screen;
@@ -54,6 +60,8 @@ public abstract class BaseZombie {
             }
         }
 
+        updateSlowState(delta);
+
         switch (state) {
             case WALK:
             case LOST_HEAD:
@@ -80,7 +88,7 @@ public abstract class BaseZombie {
     }
 
     private void moveForward (float delta) {
-        position.x -= getWalkSpeed() * delta;
+        position.x -= getWalkSpeed() * getMovementMultiplier() * delta;
         BasePlant plant = screen.findPlantInRow(row, collisionBounds);
         if (plant != null) {
             targetPlant = plant;
@@ -96,7 +104,11 @@ public abstract class BaseZombie {
             return;
         }
 
-        if (attackTimer >= getAttackInterval()) {
+        float effectiveInterval = getAttackInterval();
+        if (speedMultiplier < 1f) {
+            effectiveInterval /= Math.max(speedMultiplier, 0.01f);
+        }
+        if (attackTimer >= effectiveInterval) {
             attackTimer = 0f;
             applyAttack(targetPlant);
         }
@@ -148,6 +160,16 @@ public abstract class BaseZombie {
         float height = frame.getRegionHeight() * scale;
         float drawX = position.x + getDrawOffsetX();
         batch.draw(frame, drawX, position.y, width, height);
+        if (isSlowed()) {
+            Color currentColor = batch.getColor();
+            float originalR = currentColor.r;
+            float originalG = currentColor.g;
+            float originalB = currentColor.b;
+            float originalA = currentColor.a;
+            batch.setColor(SLOW_OVERLAY_COLOR);
+            batch.draw(frame, drawX, position.y, width, height);
+            batch.setColor(originalR, originalG, originalB, originalA);
+        }
     }
 
     /**
@@ -192,6 +214,43 @@ public abstract class BaseZombie {
 
     public boolean isAlive () {
         return alive;
+    }
+
+    public void applySlow (float multiplier, float duration) {
+        if (duration <= 0f) return;
+        multiplier = MathUtils.clamp(multiplier, 0.1f, 1f);
+        if (speedMultiplier == 1f || multiplier < speedMultiplier || slowTimer <= 0f) {
+            speedMultiplier = multiplier;
+            slowDuration = duration;
+        } else if (multiplier == speedMultiplier) {
+            slowDuration = Math.max(slowDuration, duration);
+        }
+        slowTimer = Math.max(slowTimer, duration);
+    }
+
+    private boolean isSlowed () {
+        return slowTimer > 0f && speedMultiplier < 1f;
+    }
+
+    private float getMovementMultiplier () {
+        return speedMultiplier;
+    }
+
+    private void updateSlowState (float delta) {
+        if (slowTimer <= 0f) {
+            slowTimer = 0f;
+            if (speedMultiplier != 1f) {
+                speedMultiplier = 1f;
+                slowDuration = 0f;
+            }
+            return;
+        }
+        slowTimer -= delta;
+        if (slowTimer <= 0f) {
+            slowTimer = 0f;
+            speedMultiplier = 1f;
+            slowDuration = 0f;
+        }
     }
 
     protected abstract float getWalkSpeed ();

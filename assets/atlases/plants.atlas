@@ -12,34 +12,34 @@ peashooter
 	bounds: 1352, 157, 71, 71
 peashooter
 	index: 0
-	bounds: 1275, 11, 71, 71
-peashooter
-	index: 5
-	bounds: 1350, 84, 71, 71
-peashooter
-	index: 2
 	bounds: 1425, 157, 71, 71
 peashooter
-	index: 10
-	bounds: 1348, 11, 71, 71
-peashooter
-	index: 7
-	bounds: 1423, 84, 71, 71
-peashooter
-	index: 4
+	index: 5
 	bounds: 1498, 157, 71, 71
 peashooter
-	index: 12
-	bounds: 1421, 11, 71, 71
-peashooter
-	index: 9
-	bounds: 1496, 84, 71, 71
-peashooter
-	index: 1
+	index: 2
 	bounds: 1571, 157, 71, 71
 peashooter
-	index: 6
+	index: 10
 	bounds: 1494, 11, 71, 71
+peashooter
+	index: 7
+	bounds: 1644, 157, 71, 71
+peashooter
+	index: 4
+	bounds: 1717, 157, 71, 71
+peashooter
+	index: 12
+	bounds: 1640, 11, 71, 71
+peashooter
+	index: 9
+	bounds: 1715, 84, 71, 71
+peashooter
+	index: 1
+	bounds: 1863, 157, 71, 71
+peashooter
+	index: 6
+	bounds: 1786, 11, 71, 71
 repeaterpea
 	index: 6
 	bounds: 827, 5, 73, 71
@@ -85,6 +85,51 @@ repeaterpea
 repeaterpea
 	index: 13
 	bounds: 1277, 157, 73, 71
+snow_peashooter
+	index: 8
+	bounds: 1275, 11, 71, 71
+snow_peashooter
+	index: 0
+	bounds: 1350, 84, 71, 71
+snow_peashooter
+	index: 14
+	bounds: 1348, 11, 71, 71
+snow_peashooter
+	index: 5
+	bounds: 1423, 84, 71, 71
+snow_peashooter
+	index: 6
+	bounds: 1423, 84, 71, 71
+snow_peashooter
+	index: 11
+	bounds: 1421, 11, 71, 71
+snow_peashooter
+	index: 2
+	bounds: 1496, 84, 71, 71
+snow_peashooter
+	index: 7
+	bounds: 1569, 84, 71, 71
+snow_peashooter
+	index: 13
+	bounds: 1567, 11, 71, 71
+snow_peashooter
+	index: 4
+	bounds: 1642, 84, 71, 71
+snow_peashooter
+	index: 9
+	bounds: 1790, 157, 71, 71
+snow_peashooter
+	index: 10
+	bounds: 1713, 11, 71, 71
+snow_peashooter
+	index: 1
+	bounds: 1788, 84, 71, 71
+snow_peashooter
+	index: 12
+	bounds: 1861, 84, 71, 71
+snow_peashooter
+	index: 3
+	bounds: 1936, 157, 71, 71
 sunflower_active
 	index: 9
 	bounds: 2, 78, 73, 74

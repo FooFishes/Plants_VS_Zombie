@@ -19,6 +19,7 @@ import work.foofish.pvz.entities.bullets.PeaBullet;
 import work.foofish.pvz.entities.plants.BasePlant;
 import work.foofish.pvz.entities.plants.Peashooter;
 import work.foofish.pvz.entities.plants.RepeaterPea;
+import work.foofish.pvz.entities.plants.SnowPea;
 import work.foofish.pvz.entities.plants.Sunflower;
 import work.foofish.pvz.entities.zombies.BaseZombie;
 import work.foofish.pvz.entities.zombies.NormalZombie;
@@ -126,10 +127,15 @@ public class GameScreen implements Screen, InputProcessor {
         TextureRegion sunflowerGhost = null;
         TextureRegion peashooterGhost = null;
         TextureRegion repeaterGhost = null;
+        TextureRegion snowPeaGhost = null;
         if (plantsAtlas != null) {
             sunflowerGhost = plantsAtlas.findRegion(AssetPaths.REGION_SUNFLOWER_NORMAL);
             peashooterGhost = plantsAtlas.findRegion(AssetPaths.REGION_PEASHOOTER);
             repeaterGhost = plantsAtlas.findRegion(AssetPaths.REGION_REPEATERPEA);
+            snowPeaGhost = plantsAtlas.findRegion(AssetPaths.REGION_SNOWPEA);
+            if (snowPeaGhost == null) {
+                snowPeaGhost = peashooterGhost;
+            }
         }
 
         // Initialize Seed Cards
@@ -139,7 +145,7 @@ public class GameScreen implements Screen, InputProcessor {
                 sunflowerGhost,
                 50,
                 7.5f,
-                0f,
+                -5f,
                 "Sunflower",
                 (screen, cell, row, col) -> new Sunflower(screen, cell.x, cell.y, row, col)
             ));
@@ -148,16 +154,25 @@ public class GameScreen implements Screen, InputProcessor {
                 peashooterGhost,
                 100,
                 7f,
-                -3f,
+                -10f,
                 "Peashooter",
                 (screen, cell, row, col) -> new Peashooter(screen, cell.x, cell.y, row, col)
+            ));
+            seedCards.add(new SeedCard(
+                cardAtlas.findRegion(AssetPaths.REGION_CARD_SNOWPEA),
+                snowPeaGhost,
+                175,
+                7.5f,
+                -12f,
+                "SnowPea",
+                (screen, cell, row, col) -> new SnowPea(screen, cell.x, cell.y, row, col)
             ));
             seedCards.add(new SeedCard(
                 cardAtlas.findRegion(AssetPaths.REGION_CARD_REPEATERPEA),
                 repeaterGhost,
                 200,
                 7.5f,
-                -3f,
+                -15f,
                 "RepeaterPea",
                 (screen, cell, row, col) -> new RepeaterPea(screen, cell.x, cell.y, row, col)
             ));
@@ -166,7 +181,7 @@ public class GameScreen implements Screen, InputProcessor {
         // 创建字体用于显示阳光数量
         this.font = new BitmapFont(); // 使用默认字体
         this.font.setColor(Color.BLACK);
-        this.font.getData().setScale(1.2f); // 放大字体
+        this.font.getData().setScale(1.0f); // 略微缩小阳光字体
 
         initGrid();
         // Removed default sunflower adding to allow player to plant
@@ -397,7 +412,7 @@ public class GameScreen implements Screen, InputProcessor {
 
         float originalHeight = chooserBackground != null ? chooserBackground.getRegionHeight() : 87f;
         float originalWidth = chooserBackground != null ? chooserBackground.getRegionWidth() : 450f;
-        float chooserScale = 0.85f;
+        float chooserScale = 0.95f;
 
         float newHeight = originalHeight * chooserScale;
         float scale = chooserScale;
@@ -415,18 +430,37 @@ public class GameScreen implements Screen, InputProcessor {
         float cardWidth = 54f * scale;
         float cardHeight = 68f * scale;
         // Slot spacing based on debug renderer (64 * scale)
-        float slotSpacing = 64f * scale;
+        float slotSpacing = (64f - 3f) * scale;
         // First card starts at 80px from chooser left edge
         float firstCardOffsetX = 78f * scale;
         // Vertical offset: Center in the chooser height
         // newHeight is the chooser height.
         float slotOffsetY = (newHeight - cardHeight) / 2f;
 
+        float baseCardSpacing = 0f;
+        float previousCardX = 0f;
+        float cumulativeSpacingAdjustment = 0f;
         for (int i = 0; i < seedCards.size(); i++) {
             SeedCard card = seedCards.get(i);
             float slotX = chooserX + firstCardOffsetX + i * slotSpacing;
             float slotY = chooserY + slotOffsetY;
-            float drawX = slotX + card.offsetX;
+            float rawDrawX = slotX + card.offsetX + cumulativeSpacingAdjustment;
+            float drawX = rawDrawX;
+            if (i == 0) {
+                previousCardX = drawX;
+            } else {
+                if (baseCardSpacing == 0f) {
+                    baseCardSpacing = drawX - previousCardX;
+                } else {
+                    float actualSpacing = rawDrawX - previousCardX;
+                    float spacingDiff = baseCardSpacing - actualSpacing;
+                    if (Math.abs(spacingDiff) > 0.0001f) {
+                        drawX += spacingDiff;
+                        cumulativeSpacingAdjustment += spacingDiff;
+                    }
+                }
+                previousCardX = drawX;
+            }
 
             // Update bounds for click detection
             card.setBounds(drawX, slotY, cardWidth, cardHeight);

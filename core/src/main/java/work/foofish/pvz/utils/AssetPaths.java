@@ -17,13 +17,17 @@ public class AssetPaths {
     public static final String REGION_CHOOSER = "chooser";
     public static final String REGION_SUN = "sun";
 
+    public static final String REGION_CAR = "car";
+
     // 卡片区域
     public static final String REGION_CARD_PEASHOOTER = "card_peashooter";
     public static final String REGION_CARD_REPEATERPEA = "card_repeaterpea";
+    public static final String REGION_CARD_SNOWPEA = "card_snowpea";
     public static final String REGION_CARD_SUNFLOWER = "card_sunflower";
 
     // 植物区域
     public static final String REGION_PEASHOOTER = "peashooter";
+    public static final String REGION_SNOWPEA = "snow_peashooter";
     public static final String REGION_REPEATERPEA = "repeaterpea";
     public static final String REGION_SUNFLOWER_ACTIVE = "sunflower_active";
     public static final String REGION_SUNFLOWER_NORMAL = "sunflower_normal";
@@ -31,6 +35,8 @@ public class AssetPaths {
     // 子弹区域
     public static final String REGION_PEA_NORMAL = "pea_normal";
     public static final String REGION_PEA_NORMAL_EXPLODE = "pea_normal_explode";
+    public static final String REGION_PEA_SNOW = "pea_snow";
+    public static final String REGION_PEA_SNOW_EXPLODE = "pea_snow_explode";
 
     // 僵尸区域
     public static final String REGION_NORMAL_ATTACK = "normal_zombie_attack";
