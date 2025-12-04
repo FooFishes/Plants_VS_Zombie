@@ -58,6 +58,26 @@ public class HomeScreen implements Screen {
         table.align(Align.topRight);
         stage.addActor(table);
         table.toFront();
+
+        // 图鉴按钮
+        TextureRegion almanacUp = atlas.findRegion(AssetPaths.REGION_ALMANAC_BTN_UP);
+        TextureRegion almanacDown = atlas.findRegion(AssetPaths.REGION_ALMANAC_BTN_DOWN);
+        if (almanacUp != null && almanacDown != null) {
+            Button.ButtonStyle almanacStyle = new Button.ButtonStyle();
+            almanacStyle.up = skin.newDrawable(AssetPaths.REGION_ALMANAC_BTN_UP);
+            almanacStyle.down = skin.newDrawable(AssetPaths.REGION_ALMANAC_BTN_DOWN);
+            skin.add("almanac_button", almanacStyle);
+
+            Button almanac = new Button(skin, "almanac_button");
+            almanac.setPosition(370, 60);
+            almanac.addListener(new ChangeListener() {
+                @Override
+                public void changed (ChangeEvent event, Actor actor) {
+                    game.setScreen(new AlmanacScreen(game, HomeScreen.this));
+                }
+            });
+            stage.addActor(almanac);
+        }
     }
 
     @Override
