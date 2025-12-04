@@ -12,8 +12,8 @@ import work.foofish.pvz.utils.AssetPaths;
 public class NormalZombie extends BaseZombie {
     private static final int HEALTH = 270;
     private static final float WALK_SPEED = 19f;
-    private static final int BITE_DAMAGE = 20;
-    private static final float ATTACK_INTERVAL = 1.0f;
+    private static final int BITE_DAMAGE = 4;
+    private static final float ATTACK_INTERVAL = .04f;
     private static final float DRAW_SCALE = 0.9f;
 
     private final Animation<TextureRegion> walkAnimation;

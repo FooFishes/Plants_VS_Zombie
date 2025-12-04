@@ -16,8 +16,8 @@ import work.foofish.pvz.utils.AssetPaths;
  */
 public class CherryBomb extends BasePlant {
     private static final int COST = 150;
-    private static final int HEALTH = 999;
-    private static final float COOLDOWN = 30f;
+    private static final int HEALTH = 300;
+    private static final float COOLDOWN = 50f;
     private static final float FUSE_TIME = 1.0f;
     private static final float EXPLOSION_RADIUS = 150f;
     private static final int EXPLOSION_DAMAGE = 1800;

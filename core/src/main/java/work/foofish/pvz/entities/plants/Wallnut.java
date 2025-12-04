@@ -9,8 +9,8 @@ import work.foofish.pvz.utils.AssetPaths;
 
 public class Wallnut extends BasePlant {
     private static final int COST = 50;
-    private static final int HEALTH = 400;
-    private static final float COOLDOWN = 15f;
+    private static final int HEALTH = 4000;
+    private static final float COOLDOWN = 30f;
 
     private enum DamageStage {
         NORMAL,

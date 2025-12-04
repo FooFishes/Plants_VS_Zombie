@@ -17,8 +17,8 @@ public class BucketheadZombie extends BaseZombie {
     private static final int BUCKET_HEALTH = 1100;
     private static final int TOTAL_HEALTH = BODY_HEALTH + BUCKET_HEALTH;
     private static final float WALK_SPEED = 19f;
-    private static final int BITE_DAMAGE = 20;
-    private static final float ATTACK_INTERVAL = 1.0f;
+    private static final int BITE_DAMAGE = 4;
+    private static final float ATTACK_INTERVAL = .04f;
     private static final float DRAW_SCALE = 0.9f;
     private static final float EXTRA_LOST_HEAD_OFFSET = 25f;
     private static final float DEFAULT_REFERENCE_WIDTH = 75f;

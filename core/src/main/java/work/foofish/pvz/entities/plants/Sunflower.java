@@ -14,7 +14,7 @@ public class Sunflower extends BasePlant {
     private static final int COST = 50;
     private static final int HEALTH = 300;
     private static final float COOLDOWN = 7.5f;
-    private static final float PRODUCTION_INTERVAL = 5f;
+    private static final float PRODUCTION_INTERVAL = 24f;
     private static final float ACTIVE_DURATION = 1.0f;
 
     private enum State {
@@ -41,7 +41,7 @@ public class Sunflower extends BasePlant {
         this.activeAnimation = new Animation<>(0.1f, atlas.findRegions(AssetPaths.REGION_SUNFLOWER_ACTIVE), Animation.PlayMode.LOOP);
 
         this.currentState = State.IDLE;
-        this.productionTimer = 0f;
+        this.productionTimer = PRODUCTION_INTERVAL - MathUtils.random(3f, 12.5f);
         this.stateTimer = 0f;
     }
 

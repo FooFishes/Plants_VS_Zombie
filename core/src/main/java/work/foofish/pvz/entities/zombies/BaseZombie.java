@@ -28,7 +28,7 @@ public abstract class BaseZombie {
     private static final float CENTER_COLLISION_WIDTH = 10f;
     private static final float LOST_HEAD_DURATION = 1.0f; // 掉头后存活1秒
     private float lostHeadTimer = 0f; // 掉头后的计时器
-    private static final Color SLOW_OVERLAY_COLOR = new Color(0.1f, 0.45f, 0.95f, 0.7f);
+    private static final Color SLOW_OVERLAY_COLOR = new Color(0f, 0f, 1f, .7f);
     private static final Color HIT_FLASH_COLOR = new Color(1f, 1f, 1f, 1f);
     private static final float HIT_FLASH_DURATION = 0.18f;
     private float hitFlashTimer = 0f;
@@ -158,7 +158,7 @@ public abstract class BaseZombie {
     }
 
     protected int getLostHeadThreshold () {
-        return maxHealth / 2;
+        return maxHealth / 3;
     }
 
     protected void switchTo (ZombieState newState) {

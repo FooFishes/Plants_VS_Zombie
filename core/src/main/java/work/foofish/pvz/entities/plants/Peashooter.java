@@ -3,6 +3,7 @@ package work.foofish.pvz.entities.plants;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import work.foofish.pvz.entities.bullets.PeaBullet;
 import work.foofish.pvz.screens.GameScreen;
 import work.foofish.pvz.utils.AssetPaths;
@@ -11,7 +12,7 @@ public class Peashooter extends BasePlant {
     private static final int COST = 100;
     private static final int HEALTH = 300;
     private static final float COOLDOWN = 7f;
-    private static final float SHOOT_INTERVAL = 1.5f;
+    private static final float SHOOT_INTERVAL = MathUtils.random(1.36f, 1.5f);
     private static final float BULLET_SPEED = 280f;
     private static final int BULLET_DAMAGE = 20;
 
