@@ -1,0 +1,41 @@
+almanac.png
+	size: 2048, 2048
+	repeat: none
+almanac_btn_hl
+	bounds: 1130, 1191, 164, 26
+almanac_close_btn
+	bounds: 160, 90, 89, 26
+almanac_close_btn_hl
+	bounds: 328, 545, 89, 26
+almanac_ground_day
+	bounds: 1606, 1619, 200, 200
+almanac_index_bg
+	bounds: 2, 1219, 800, 600
+almanac_index_btn
+	bounds: 804, 705, 164, 26
+almanac_plant_bg
+	bounds: 2, 617, 800, 600
+almanac_plant_card
+	bounds: 804, 733, 324, 484
+almanac_zombie_bg
+	bounds: 804, 1219, 800, 600
+almanac_zombie_card
+	bounds: 2, 118, 324, 497
+button_down_left
+	bounds: 1606, 1493, 36, 46
+button_down_middle
+	bounds: 1130, 1143, 46, 46
+button_middle
+	bounds: 804, 657, 46, 46
+button_right
+	bounds: 1684, 1571, 35, 46
+seed_chooser_btn
+	bounds: 328, 573, 156, 42
+seed_chooser_btn_glow
+	bounds: 2, 74, 156, 42
+seed_packet_flash
+	bounds: 2, 2, 50, 70
+zombie_window_bg
+	bounds: 1606, 1541, 76, 76
+zombie_window_border
+	bounds: 1808, 1743, 76, 76

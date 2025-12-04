@@ -91,7 +91,8 @@ public class AlmanacScreen implements Screen {
         camera.update();
 
         this.stage = new Stage(viewport, game.batch);
-        this.font = game.debugFont;
+        // 所有图鉴中的中文文本统一使用 PvzGame.uiFont，如果为空则回退到 debugFont
+        this.font = game.uiFont != null ? game.uiFont : game.debugFont;
 
         initIndexPage();
     }

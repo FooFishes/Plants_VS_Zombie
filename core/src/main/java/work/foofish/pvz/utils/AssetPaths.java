@@ -61,6 +61,8 @@ public class AssetPaths {
 
     // 字体
     // 如需要，在此添加字体路径
+    // 通过 AssetService + manifest.json 使用 FreeType 加载的中文字体
+    public static final String FONT_CN_DEFAULT = "cn_default.ttf";
 
     // 音乐
     // 如需要，在此添加音乐路径
