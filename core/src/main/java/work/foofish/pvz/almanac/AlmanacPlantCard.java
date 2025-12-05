@@ -27,6 +27,7 @@ public class AlmanacPlantCard extends Group {
 
         this.cardActor = new TextureRegionActor(cardRegion);
         this.cardActor.setPosition(0, 0);
+        this.cardActor.setScale(0.82f,0.77f);
         addActor(cardActor);
 
         // 高亮效果（如果有的话）
@@ -41,7 +42,7 @@ public class AlmanacPlantCard extends Group {
             this.highlightActor = null;
         }
 
-        setSize(cardActor.getWidth(), cardActor.getHeight());
+        setSize(cardActor.getWidth()*0.82f, cardActor.getHeight()*0.77f);
 
         addListener(new InputListener() {
             @Override

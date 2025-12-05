@@ -103,7 +103,7 @@ public class AlmanacScreen implements Screen {
         Array<TextureAtlas.AtlasRegion> sunflowerFrames = plantsAtlas.findRegions(AssetPaths.REGION_SUNFLOWER_NORMAL);
         Animation<TextureRegion> sunflowerAnim = new Animation<>(0.1f, sunflowerFrames, Animation.PlayMode.LOOP);
         indexSunflower = new AlmanacAnimationActor(sunflowerAnim, 1.5f);
-        indexSunflower.setPosition(200, 300);
+        indexSunflower.setPosition(190, 290);
 
         // 创建索引页的僵尸动画
         TextureAtlas zombiesAtlas = assets.getAtlas(AssetPaths.ZOMBIES_ATLAS);
@@ -111,7 +111,7 @@ public class AlmanacScreen implements Screen {
         Animation<TextureRegion> zombieAnim = new Animation<>(0.09f, zombieFrames, Animation.PlayMode.LOOP);
         indexZombie = new AlmanacAnimationActor(zombieAnim, 1.2f);
         indexZombie.setFlipX(true);
-        indexZombie.setPosition(580, 280);
+        indexZombie.setPosition(580, 245);
 
         TextureAtlas almanacAtlas = assets.getAtlas(AssetPaths.ALMANAC_ATLAS);
 
@@ -225,32 +225,33 @@ public class AlmanacScreen implements Screen {
         TextureRegion groundRegion = almanacAtlas.findRegion(AssetPaths.REGION_ALMANAC_GROUND_DAY);
         if (groundRegion != null) {
             plantGroundActor = new TextureRegionActor(groundRegion);
-            plantGroundActor.setPosition(600, 320);
+            plantGroundActor.setPosition(595, 370);
+            plantGroundActor.setScale(0.93f,0.70f);
         }
 
         // 植物名称标签
         plantNameLabel = new Label("", new Label.LabelStyle(font, Color.YELLOW));
-        plantNameLabel.setPosition(650, 320);
+        plantNameLabel.setPosition(615, 343);
         plantNameLabel.setWidth(150f);
         plantNameLabel.setAlignment(Align.center);
 
         // 详情表格
         plantDetailTable = new Table();
         plantDetailTable.setPosition(560, 310);
-        plantDetailTable.setWidth(300f);
+        plantDetailTable.setWidth(260f);
         plantDetailTable.top();
 
         // 花费和充能标签
         plantCostLabel = new Label("", new Label.LabelStyle(font, Color.WHITE));
-        plantCostLabel.setPosition(560, 80);
+        plantCostLabel.setPosition(560, 90);
 
         plantRechargeLabel = new Label("", new Label.LabelStyle(font, Color.WHITE));
-        plantRechargeLabel.setPosition(750, 80);
+        plantRechargeLabel.setPosition(750, 90);
 
         // 创建植物卡片
-        int gapX = 58;
-        int startX = 30;
-        int startY = 480;
+        double gapX = 58.3;
+        int startX = 34;
+        int startY = 440;
 
         for (AlmanacPlantType plantType : AlmanacPlantType.values()) {
             AlmanacPlantCard card = new AlmanacPlantCard(plantType, assets);
@@ -285,7 +286,7 @@ public class AlmanacScreen implements Screen {
         Array<TextureAtlas.AtlasRegion> frames = plantsAtlas.findRegions(card.getPlantType().getAnimationRegion());
         Animation<TextureRegion> anim = new Animation<>(0.1f, frames, Animation.PlayMode.LOOP);
         selectedPlantActor = new AlmanacAnimationActor(anim, 1.5f);
-        selectedPlantActor.setPosition(660, 360);
+        selectedPlantActor.setPosition(640, 383);
 
         // 读取 JSON 配置
         String jsonPath = card.getPlantType().getJsonPath();
@@ -329,20 +330,20 @@ public class AlmanacScreen implements Screen {
     private void initZombieDetailsPage() {
         // 僵尸名称标签
         zombieNameLabel = new Label("", new Label.LabelStyle(font, Color.GREEN));
-        zombieNameLabel.setPosition(650, 260);
+        zombieNameLabel.setPosition(615, 275);
         zombieNameLabel.setWidth(150f);
         zombieNameLabel.setAlignment(Align.center);
 
         // 详情表格
         zombieDetailTable = new Table();
         zombieDetailTable.setPosition(560, 250);
-        zombieDetailTable.setWidth(300f);
+        zombieDetailTable.setWidth(265f);
         zombieDetailTable.top();
 
         // 创建僵尸卡片
-        int gapX = 95;
+        int gapX = 85;
         int startX = 25;
-        int startY = 480;
+        int startY = 440;
 
         for (AlmanacZombieType zombieType : AlmanacZombieType.values()) {
             AlmanacZombieCard card = new AlmanacZombieCard(zombieType, assets);
@@ -378,7 +379,7 @@ public class AlmanacScreen implements Screen {
         Animation<TextureRegion> anim = new Animation<>(0.09f, frames, Animation.PlayMode.LOOP);
         selectedZombieActor = new AlmanacAnimationActor(anim, card.getZombieType().getScale());
         selectedZombieActor.setFlipX(true);
-        selectedZombieActor.setPosition(660, 300);
+        selectedZombieActor.setPosition(645, 350);
 
         // 读取 JSON 配置
         String jsonPath = card.getZombieType().getJsonPath();
@@ -500,7 +501,7 @@ public class AlmanacScreen implements Screen {
             }
             TextureRegion groundRegion = almanacAtlas.findRegion(AssetPaths.REGION_ALMANAC_GROUND_DAY);
             if (groundRegion != null) {
-                game.batch.draw(groundRegion, 600, 300);
+                game.batch.draw(groundRegion, 590, 300);
             }
         }
         game.batch.end();
