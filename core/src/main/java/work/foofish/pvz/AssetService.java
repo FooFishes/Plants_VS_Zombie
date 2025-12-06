@@ -58,9 +58,13 @@ public final class AssetService {
         JsonValue fonts = root.get("fonts");
         if (fonts != null) {
             for (JsonValue font : fonts) {
-                FreetypeFontLoader.FreeTypeFontLoaderParameter parameter = new FreetypeFontLoader.FreeTypeFontLoaderParameter();
+                FreetypeFontLoader.FreeTypeFontLoaderParameter parameter =
+                    new FreetypeFontLoader.FreeTypeFontLoaderParameter();
                 parameter.fontFileName = font.getString("file");
                 parameter.fontParameters.size = font.getInt("size");
+                // 使用增量字体模式：首次仅生成基础字符集，后续在绘制时按需生成新字形。
+                // 这样无需提前枚举所有中文字符，就能正确显示任意中文文本。
+                parameter.fontParameters.incremental = true;
                 manager.load(font.getString("key") + ".ttf", BitmapFont.class, parameter);
             }
         }

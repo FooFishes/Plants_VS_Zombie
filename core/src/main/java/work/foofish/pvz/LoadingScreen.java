@@ -3,9 +3,11 @@ package work.foofish.pvz;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import work.foofish.pvz.screens.HomeScreen;
+import work.foofish.pvz.utils.AssetPaths;
 
 public class LoadingScreen implements Screen {
     private final PvzGame game;
@@ -42,6 +44,14 @@ public class LoadingScreen implements Screen {
         game.batch.end();
 
         if (assets.update() && elapsed > 1f) {
+            // 资源加载完成后，从 AssetManager 中获取中文 UI 字体
+            try {
+                BitmapFont cnFont = assets.get(AssetPaths.FONT_CN_DEFAULT, BitmapFont.class);
+                game.uiFont = cnFont != null ? cnFont : game.debugFont;
+            } catch (Exception e) {
+                // 如果字体加载失败，则继续使用调试字体，避免阻塞游戏
+                game.uiFont = game.debugFont;
+            }
             game.setScreen(new HomeScreen(game));
         }
     }

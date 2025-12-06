@@ -5,6 +5,14 @@
     "atlases/maps.atlas",
     "atlases/cards.atlas",
     "atlases/bullets.atlas",
-    "atlases/zombies.atlas"
+    "atlases/zombies.atlas",
+    "atlases/almanac.atlas"
+  ],
+  "fonts": [
+    {
+      "key": "cn_default",
+      "file": "raw/chinese.ttf",
+      "size": 14
+    }
   ]
 }

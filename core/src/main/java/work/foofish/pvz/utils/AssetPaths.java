@@ -8,6 +8,7 @@ public class AssetPaths {
     public static final String PLANTS_ATLAS = "atlases/plants.atlas";
     public static final String UI_ATLAS = "atlases/ui.atlas";
     public static final String ZOMBIES_ATLAS = "atlases/zombies.atlas";
+    public static final String ALMANAC_ATLAS = "atlases/almanac.atlas";
 
     // 地图与背景区域
     public static final String REGION_SIMPLE_DAY = "simple_day";
@@ -60,12 +61,36 @@ public class AssetPaths {
 
     // 字体
     // 如需要，在此添加字体路径
+    // 通过 AssetService + manifest.json 使用 FreeType 加载的中文字体
+    public static final String FONT_CN_DEFAULT = "cn_default.ttf";
 
     // 音乐
     // 如需要，在此添加音乐路径
 
     // 音效
     // 如需要，在此添加音效路径
+
+    // 图鉴相关区域 (almanac.atlas)
+    public static final String REGION_ALMANAC_INDEX_BG = "almanac_index_bg";
+    public static final String REGION_ALMANAC_PLANT_BG = "almanac_plant_bg";
+    public static final String REGION_ALMANAC_ZOMBIE_BG = "almanac_zombie_bg";
+    public static final String REGION_ALMANAC_PLANT_CARD = "almanac_plant_card";
+    public static final String REGION_ALMANAC_ZOMBIE_CARD = "almanac_zombie_card";
+    public static final String REGION_ALMANAC_GROUND_DAY = "almanac_ground_day";
+    public static final String REGION_ALMANAC_INDEX_BTN = "almanac_index_btn";
+    public static final String REGION_ALMANAC_INDEX_BTN_HL = "almanac_index_btn_hl";
+    public static final String REGION_ALMANAC_CLOSE_BTN = "almanac_close_btn";
+    public static final String REGION_ALMANAC_CLOSE_BTN_HL = "almanac_close_btn_hl";
+    public static final String REGION_SEED_CHOOSER_BTN = "seed_chooser_btn";
+    public static final String REGION_SEED_CHOOSER_BTN_GLOW = "seed_chooser_btn_glow";
+    public static final String REGION_ZOMBIE_WINDOW_BORDER = "zombie_window_border";
+    public static final String REGION_ZOMBIE_WINDOW_BG = "zombie_window_bg";
+    public static final String REGION_SEED_PACKET_FLASH = "seed_packet_flash";
+    public static final String REGION_GRAVE_BTN = "grave_btn";
+    public static final String REGION_GRAVE_BTN_GLOW = "grave_btn_glow";
+    // 主菜单图鉴按钮 (ui.atlas)
+    public static final String REGION_ALMANAC_BTN_UP = "almanac_btn_up";
+    public static final String REGION_ALMANAC_BTN_DOWN = "almanac_btn_down";
 
     private AssetPaths () {
         // 私有构造函数，防止实例化
