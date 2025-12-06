@@ -52,12 +52,12 @@ public class GameScreen implements Screen, InputProcessor {
     private static final float CELL_WIDTH = 80f;
     private static final float CELL_HEIGHT = 95f;
     private static final float GRID_OFFSET_X = 260f; // 从地图左侧到网格左侧的距离
-    private static final float GRID_OFFSET_Y = 85f;  // 从地图顶部到网格顶部的距离
+    private static final float GRID_OFFSET_Y = 85f; // 从地图顶部到网格顶部的距离
 
     private final PvzGame game;
     private final AssetService assets;
 
-    public AssetService getAssets () {
+    public AssetService getAssets() {
         return assets;
     }
 
@@ -106,13 +106,28 @@ public class GameScreen implements Screen, InputProcessor {
     // 天空掉落阳光计时器
     private float sunSpawnTimer = 0f;
     private float nextSunSpawnTime = 5f; // 初始5秒后掉落第一个阳光
-    private final ZombieSpawner zombieSpawner = new ZombieSpawner();
+    private final LevelManager levelManager = new LevelManager();
     private boolean debugOverlayEnabled;
+    // Progress Bar Settings
+    private static final float PROGRESS_BAR_WIDTH = 150f;
+    private static final float PROGRESS_BAR_HEIGHT = 15f;
+    private static final float PROGRESS_BAR_RIGHT_MARGIN = 20f;
+    private static final float PROGRESS_BAR_BOTTOM_MARGIN = 20f;
+
+    // Notifications & UI
+    private String statusText = ""; // Persistent
+    private String toastText = ""; // Temporary
+    private float toastTimer = 0f;
+    private final Rectangle exitButtonRect = new Rectangle();
+    private static final float EXIT_BTN_WIDTH = 100f;
+    private static final float EXIT_BTN_HEIGHT = 40f;
+    private static final float EXIT_BTN_MARGIN = 10f;
+
     private final Vector3 worldTouch = new Vector3();
     private final Vector3 uiTouch = new Vector3();
     private final Vector3 tmpVec = new Vector3();
 
-    public GameScreen (PvzGame game) {
+    public GameScreen(PvzGame game) {
         this.game = game;
         this.assets = game.getAssets();
         // 使用 FitViewport 保持与游戏世界一致的缩放
@@ -129,9 +144,11 @@ public class GameScreen implements Screen, InputProcessor {
         // 加载UI图集中的chooser背景
         TextureAtlas uiAtlasForChooser = this.assets.getAtlas(AssetPaths.UI_ATLAS);
         this.chooserBackground = uiAtlasForChooser.findRegion(AssetPaths.REGION_CHOOSER);
-        TextureRegion shovelRegion = uiAtlasForChooser != null ? uiAtlasForChooser.findRegion(AssetPaths.REGION_SHOVEL) : null;
+        TextureRegion shovelRegion = uiAtlasForChooser != null ? uiAtlasForChooser.findRegion(AssetPaths.REGION_SHOVEL)
+                : null;
         this.shovel = new ShovelTool(shovelRegion);
-        TextureRegion lawnMowerRegion = uiAtlasForChooser != null ? uiAtlasForChooser.findRegion(AssetPaths.REGION_CAR) : null;
+        TextureRegion lawnMowerRegion = uiAtlasForChooser != null ? uiAtlasForChooser.findRegion(AssetPaths.REGION_CAR)
+                : null;
 
         // Load Card Atlas and Plant Atlas for Ghost
         this.cardAtlas = this.assets.getAtlas(AssetPaths.CARD_ATLAS);
@@ -163,97 +180,100 @@ public class GameScreen implements Screen, InputProcessor {
         // Initialize Seed Cards
         if (cardAtlas != null) {
             seedCards.add(new SeedCard(
-                cardAtlas.findRegion(AssetPaths.REGION_CARD_SUNFLOWER),
-                sunflowerGhost,
-                50,
-                7.5f,
-                -5f,
-                "Sunflower",
-                (screen, cell, row, col) -> new Sunflower(screen, cell.x, cell.y, row, col)
-            ));
+                    cardAtlas.findRegion(AssetPaths.REGION_CARD_SUNFLOWER),
+                    sunflowerGhost,
+                    50,
+                    7.5f,
+                    -5f,
+                    "Sunflower",
+                    (screen, cell, row, col) -> new Sunflower(screen, cell.x, cell.y, row, col)));
             seedCards.add(new SeedCard(
-                cardAtlas.findRegion(AssetPaths.REGION_CARD_WALLNUT),
-                wallnutGhost,
-                50,
-                15f,
-                -7f,
-                "Wallnut",
-                (screen, cell, row, col) -> new Wallnut(screen, cell.x, cell.y, row, col)
-            ));
+                    cardAtlas.findRegion(AssetPaths.REGION_CARD_WALLNUT),
+                    wallnutGhost,
+                    50,
+                    15f,
+                    -7f,
+                    "Wallnut",
+                    (screen, cell, row, col) -> new Wallnut(screen, cell.x, cell.y, row, col)));
             seedCards.add(new SeedCard(
-                cardAtlas.findRegion(AssetPaths.REGION_CARD_PEASHOOTER),
-                peashooterGhost,
-                100,
-                7f,
-                -10f,
-                "Peashooter",
-                (screen, cell, row, col) -> new Peashooter(screen, cell.x, cell.y, row, col)
-            ));
+                    cardAtlas.findRegion(AssetPaths.REGION_CARD_PEASHOOTER),
+                    peashooterGhost,
+                    100,
+                    7f,
+                    -10f,
+                    "Peashooter",
+                    (screen, cell, row, col) -> new Peashooter(screen, cell.x, cell.y, row, col)));
             seedCards.add(new SeedCard(
-                cardAtlas.findRegion(AssetPaths.REGION_CARD_SNOWPEA),
-                snowPeaGhost,
-                175,
-                7.5f,
-                -12f,
-                "SnowPea",
-                (screen, cell, row, col) -> new SnowPea(screen, cell.x, cell.y, row, col)
-            ));
+                    cardAtlas.findRegion(AssetPaths.REGION_CARD_SNOWPEA),
+                    snowPeaGhost,
+                    175,
+                    7.5f,
+                    -12f,
+                    "SnowPea",
+                    (screen, cell, row, col) -> new SnowPea(screen, cell.x, cell.y, row, col)));
             seedCards.add(new SeedCard(
-                cardAtlas.findRegion(AssetPaths.REGION_CARD_REPEATERPEA),
-                repeaterGhost,
-                200,
-                7.5f,
-                -15f,
-                "RepeaterPea",
-                (screen, cell, row, col) -> new RepeaterPea(screen, cell.x, cell.y, row, col)
-            ));
+                    cardAtlas.findRegion(AssetPaths.REGION_CARD_REPEATERPEA),
+                    repeaterGhost,
+                    200,
+                    7.5f,
+                    -15f,
+                    "RepeaterPea",
+                    (screen, cell, row, col) -> new RepeaterPea(screen, cell.x, cell.y, row, col)));
             seedCards.add(new SeedCard(
-                cardAtlas.findRegion(AssetPaths.REGION_CARD_CHERRY_BOMB),
-                cherryBombGhost,
-                150,
-                30f,
-                -18f,
-                "CherryBomb",
-                (screen, cell, row, col) -> new CherryBomb(screen, cell.x, cell.y, row, col)
-            ));
+                    cardAtlas.findRegion(AssetPaths.REGION_CARD_CHERRY_BOMB),
+                    cherryBombGhost,
+                    150,
+                    30f,
+                    -18f,
+                    "CherryBomb",
+                    (screen, cell, row, col) -> new CherryBomb(screen, cell.x, cell.y, row, col)));
         }
 
-        // 创建字体用于显示阳光数量
-        this.font = new BitmapFont(); // 使用默认字体
-        this.font.setColor(Color.BLACK);
-        this.font.getData().setScale(1.0f); // 略微缩小阳光字体
+        // 创建字体用于显示阳光数量和通知 (使用中文字体)
+        this.font = this.assets.get(AssetPaths.FONT_CN_DEFAULT, BitmapFont.class);
+        // 如果字体未加载成功 (e.g. AssetManager还没finish loading? GameScreen在assets
+        // load完后才创建，理论上应该有了)
+        // 不过稳健起见，可以fallback，但这里假设已加载
+        if (this.font != null) {
+            this.font.getData().setScale(1.0f);
+        }
 
         initGrid();
         initLawnMowers(lawnMowerRegion);
+
+        // Setup Exit Button Rect (Top Right)
+        float exitX = VIEW_WIDTH - EXIT_BTN_WIDTH - EXIT_BTN_MARGIN;
+        float exitY = VIEW_HEIGHT - EXIT_BTN_HEIGHT - EXIT_BTN_MARGIN;
+        exitButtonRect.set(exitX, exitY, EXIT_BTN_WIDTH, EXIT_BTN_HEIGHT);
         // Removed default sunflower adding to allow player to plant
         // for (int i = 0; i < 5; i++) {
-        //     addPlant(new Sunflower(this, grid[i][i].x, grid[i][i].y));
+        // addPlant(new Sunflower(this, grid[i][i].x, grid[i][i].y));
         // }
 
         snapCameraTo(currentAnchor);
     }
 
-    public void addPlant (BasePlant plant) {
+    public void addPlant(BasePlant plant) {
         plants.add(plant);
     }
 
-    public void addSun (Sun sun) {
+    public void addSun(Sun sun) {
         suns.add(sun);
     }
 
-    public void addBullet (PeaBullet bullet) {
+    public void addBullet(PeaBullet bullet) {
         if (bullet != null) {
             bullets.add(bullet);
         }
     }
 
-    public void addBoom (Boom boom) {
+    public void addBoom(Boom boom) {
         if (boom != null) {
             booms.add(boom);
         }
     }
 
-    public void addZombie (BaseZombie zombie) {
+    public void addZombie(BaseZombie zombie) {
         if (zombie != null) {
             zombies.add(zombie);
         }
@@ -264,14 +284,14 @@ public class GameScreen implements Screen, InputProcessor {
      *
      * @param amount 增加的数量
      */
-    public void addSun (int amount) {
+    public void addSun(int amount) {
         sunCount += amount;
         if (Gdx.app != null) {
             Gdx.app.log(TAG, "Sun collected, total=" + sunCount);
         }
     }
 
-    private void spawnSkySun () {
+    private void spawnSkySun() {
         // 随机X坐标：在网格范围内 (260 到 260+720)
         // 减去阳光宽度(约50)以防超出
         float minX = GRID_OFFSET_X;
@@ -290,7 +310,7 @@ public class GameScreen implements Screen, InputProcessor {
         addSun(sun);
     }
 
-    public boolean hasZombieInRow (int rowIndex) {
+    public boolean hasZombieInRow(int rowIndex) {
         for (BaseZombie zombie : zombies) {
             if (zombie.isAlive() && zombie.getRow() == rowIndex) {
                 return true;
@@ -299,7 +319,7 @@ public class GameScreen implements Screen, InputProcessor {
         return false;
     }
 
-    public boolean hasVisibleZombieInRow (int rowIndex) {
+    public boolean hasVisibleZombieInRow(int rowIndex) {
         Rectangle cameraBounds = getCameraBounds();
         for (BaseZombie zombie : zombies) {
             if (!zombie.isAlive() || zombie.getRow() != rowIndex) {
@@ -313,14 +333,14 @@ public class GameScreen implements Screen, InputProcessor {
         return false;
     }
 
-    private Rectangle getCameraBounds () {
+    private Rectangle getCameraBounds() {
         float left = worldCamera.position.x - VIEW_WIDTH / 2f;
         float bottom = worldCamera.position.y - VIEW_HEIGHT / 2f;
         cameraBoundsCache.set(left, bottom, VIEW_WIDTH, VIEW_HEIGHT);
         return cameraBoundsCache;
     }
 
-    public BasePlant findPlantInRow (int rowIndex, Rectangle area) {
+    public BasePlant findPlantInRow(int rowIndex, Rectangle area) {
         for (BasePlant plant : plants) {
             if (!plant.isAlive() || plant.getRow() != rowIndex) {
                 continue;
@@ -332,7 +352,7 @@ public class GameScreen implements Screen, InputProcessor {
         return null;
     }
 
-    private boolean isCellOccupied (int row, int col) {
+    private boolean isCellOccupied(int row, int col) {
         Rectangle cell = grid[row][col];
         for (BasePlant plant : plants) {
             if (!plant.isAlive()) {
@@ -348,7 +368,7 @@ public class GameScreen implements Screen, InputProcessor {
         return false;
     }
 
-    private BasePlant findPlantAtCell (int row, int col) {
+    private BasePlant findPlantAtCell(int row, int col) {
         for (BasePlant plant : plants) {
             if (!plant.isAlive()) {
                 continue;
@@ -360,7 +380,7 @@ public class GameScreen implements Screen, InputProcessor {
         return null;
     }
 
-    private boolean removePlantAt (int row, int col) {
+    private boolean removePlantAt(int row, int col) {
         BasePlant plant = findPlantAtCell(row, col);
         if (plant == null) {
             return false;
@@ -370,23 +390,23 @@ public class GameScreen implements Screen, InputProcessor {
         return true;
     }
 
-    public List<BaseZombie> getZombies () {
+    public List<BaseZombie> getZombies() {
         return zombiesView;
     }
 
-    public float getWorldWidth () {
+    public float getWorldWidth() {
         return MAP_WIDTH;
     }
 
     @Override
-    public void show () {
+    public void show() {
         inputMultiplexer = new InputMultiplexer(uiStage, this);
         Gdx.input.setInputProcessor(inputMultiplexer);
         beginIntroSlide();
     }
 
     @Override
-    public void render (float delta) {
+    public void render(float delta) {
         updateCamera(delta);
 
         // 更新天空掉落阳光的计时器
@@ -397,7 +417,7 @@ public class GameScreen implements Screen, InputProcessor {
                 sunSpawnTimer = 0f;
                 nextSunSpawnTime = MathUtils.random(SKY_SUN_INTERVAL_MIN, SKY_SUN_INTERVAL_MAX); // 随机间隔 8-15 秒
             }
-            zombieSpawner.update(delta);
+            levelManager.update(delta);
 
             // Update Seed Cards Cooldown
             for (SeedCard card : seedCards) {
@@ -495,7 +515,6 @@ public class GameScreen implements Screen, InputProcessor {
         // 使用UI相机渲染顶部植物选择栏和阳光计数
         batch.setProjectionMatrix(uiStage.getCamera().combined);
         batch.begin();
-
 
         // 计算 chooser 的位置
         // 游戏网格左侧的世界坐标 X = 260
@@ -602,7 +621,8 @@ public class GameScreen implements Screen, InputProcessor {
         if (font != null) {
             String sunString = String.valueOf(sunCount);
             // 使用 GlyphLayout 计算文本宽高
-            if (layout == null) layout = new com.badlogic.gdx.graphics.g2d.GlyphLayout();
+            if (layout == null)
+                layout = new com.badlogic.gdx.graphics.g2d.GlyphLayout();
             layout.setText(font, sunString);
 
             // 用户提供的原始像素坐标 (相对于原始图片左上角)
@@ -672,7 +692,6 @@ public class GameScreen implements Screen, InputProcessor {
         shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
-
         if (debugOverlayEnabled) {
             // 绘制网格边框 - 使用轻微的内缩以清晰显示每个单元格的边界
             shapeRenderer.setProjectionMatrix(worldCamera.combined);
@@ -683,11 +702,10 @@ public class GameScreen implements Screen, InputProcessor {
                 for (int col = 0; col < GRID_COLS; col++) {
                     Rectangle rect = grid[row][col];
                     shapeRenderer.rect(
-                        rect.x + borderInset,
-                        rect.y + borderInset,
-                        rect.width - 2 * borderInset,
-                        rect.height - 2 * borderInset
-                    );
+                            rect.x + borderInset,
+                            rect.y + borderInset,
+                            rect.width - 2 * borderInset,
+                            rect.height - 2 * borderInset);
                 }
             }
             shapeRenderer.end();
@@ -703,8 +721,8 @@ public class GameScreen implements Screen, InputProcessor {
                         String label = row + "," + col;
                         GlyphLayout labelLayout = new GlyphLayout(font, label);
                         font.draw(batch, label,
-                            rect.x + (rect.width - labelLayout.width) / 2f,
-                            rect.y + (rect.height + labelLayout.height) / 2f);
+                                rect.x + (rect.width - labelLayout.width) / 2f,
+                                rect.y + (rect.height + labelLayout.height) / 2f);
                     }
                 }
                 font.setColor(Color.BLACK); // 恢复原来的颜色
@@ -712,11 +730,97 @@ public class GameScreen implements Screen, InputProcessor {
             batch.end();
         }
 
+        drawProgressBar();
+        drawUIOverlay(batch); // 绘制通知和退出按钮
+
         uiStage.act(delta);
         uiStage.draw();
     }
 
-    private void drawGhostPlant (SpriteBatch batch) {
+    private void drawUIOverlay(SpriteBatch batch) {
+        batch.setProjectionMatrix(uiStage.getCamera().combined);
+        batch.begin();
+
+        // Draw Persistent Status (Bottom Right)
+        if (font != null && !statusText.isEmpty()) {
+            GlyphLayout layout = new GlyphLayout(font, statusText);
+            float x = VIEW_WIDTH - PROGRESS_BAR_RIGHT_MARGIN - layout.width;
+            float y = PROGRESS_BAR_BOTTOM_MARGIN + PROGRESS_BAR_HEIGHT + layout.height + 5f;
+
+            font.setColor(Color.BLACK); // Changed to Black as requested
+            font.draw(batch, statusText, x, y);
+        }
+
+        // Draw Temporary Toast (Center)
+        if (toastTimer > 0f && font != null && !toastText.isEmpty()) {
+            toastTimer -= Gdx.graphics.getDeltaTime();
+            font.setColor(Color.RED); // Keep toast distinctive
+            GlyphLayout layout = new GlyphLayout(font, toastText);
+            float x = (VIEW_WIDTH - layout.width) / 2f;
+            float y = VIEW_HEIGHT / 2f + layout.height / 2f;
+            font.draw(batch, toastText, x, y);
+            font.setColor(Color.BLACK);
+        }
+
+        // Draw Exit Button
+        // Background
+        batch.end();
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        shapeRenderer.setProjectionMatrix(uiStage.getCamera().combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(0.8f, 0.2f, 0.2f, 0.8f); // Reddish button
+        shapeRenderer.rect(exitButtonRect.x, exitButtonRect.y, exitButtonRect.width, exitButtonRect.height);
+        shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+
+        batch.begin();
+        if (font != null) {
+            String wText = "退 出";
+            GlyphLayout layout = new GlyphLayout(font, wText);
+            float textX = exitButtonRect.x + (exitButtonRect.width - layout.width) / 2f;
+            float textY = exitButtonRect.y + (exitButtonRect.height + layout.height) / 2f;
+            font.setColor(Color.WHITE);
+            font.draw(batch, wText, textX, textY);
+            font.setColor(Color.BLACK);
+        }
+        batch.end();
+    }
+
+    private void drawProgressBar() {
+        if (cameraState != CameraState.PLAY)
+            return;
+
+        float progress = levelManager.getProgress();
+
+        // Calculate Position (Bottom Right)
+        float x = VIEW_WIDTH - PROGRESS_BAR_WIDTH - PROGRESS_BAR_RIGHT_MARGIN;
+        float y = PROGRESS_BAR_BOTTOM_MARGIN;
+
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        shapeRenderer.setProjectionMatrix(uiStage.getCamera().combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+        // Background (Black transparent)
+        shapeRenderer.setColor(0f, 0f, 0f, 0.5f);
+        shapeRenderer.rect(x - 2, y - 2, PROGRESS_BAR_WIDTH + 4, PROGRESS_BAR_HEIGHT + 4);
+
+        // Fill (Green)
+        if (progress > 0) {
+            shapeRenderer.setColor(0f, 0.8f, 0f, 1f);
+            shapeRenderer.rect(x, y, PROGRESS_BAR_WIDTH * progress, PROGRESS_BAR_HEIGHT);
+        }
+
+        // Flag marker at end (Red line)
+        shapeRenderer.setColor(0.8f, 0f, 0f, 1f);
+        shapeRenderer.rect(x + PROGRESS_BAR_WIDTH - 2, y - 4, 4, PROGRESS_BAR_HEIGHT + 8);
+
+        shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+
+        // Optional: Text "Level Progress"
+    }
+
+    private void drawGhostPlant(SpriteBatch batch) {
         if (selectedSeedCard == null) {
             return;
         }
@@ -750,7 +854,7 @@ public class GameScreen implements Screen, InputProcessor {
         batch.begin();
     }
 
-    private void drawShovelGhost (SpriteBatch batch) {
+    private void drawShovelGhost(SpriteBatch batch) {
         if (!shovel.isSelected() || !shovel.hasTexture()) {
             return;
         }
@@ -759,7 +863,7 @@ public class GameScreen implements Screen, InputProcessor {
         shovel.drawGhost(batch, tmpVec.x, tmpVec.y);
     }
 
-    private void drawShovelSlotFrame () {
+    private void drawShovelSlotFrame() {
         if (shovel == null) {
             return;
         }
@@ -777,17 +881,16 @@ public class GameScreen implements Screen, InputProcessor {
         for (int i = 0; i < borderLayers; i++) {
             float inset = i * insetStep;
             shapeRenderer.rect(
-                shovel.getX() + inset,
-                shovel.getY() + inset,
-                shovel.getWidth() - 2f * inset,
-                shovel.getHeight() - 2f * inset
-            );
+                    shovel.getX() + inset,
+                    shovel.getY() + inset,
+                    shovel.getWidth() - 2f * inset,
+                    shovel.getHeight() - 2f * inset);
         }
         shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 
-    private GhostPlacement calculateGhostPlacement (TextureRegion ghostRegion) {
+    private GhostPlacement calculateGhostPlacement(TextureRegion ghostRegion) {
         ghostPlacement.reset();
         worldTouch.set(Gdx.input.getX(), Gdx.input.getY(), 0f);
         worldViewport.unproject(worldTouch);
@@ -814,28 +917,28 @@ public class GameScreen implements Screen, InputProcessor {
     }
 
     @Override
-    public void resize (int width, int height) {
+    public void resize(int width, int height) {
         worldViewport.update(width, height);
         uiStage.getViewport().update(width, height, true);
     }
 
     @Override
-    public void pause () {
+    public void pause() {
     }
 
     @Override
-    public void resume () {
+    public void resume() {
     }
 
     @Override
-    public void hide () {
+    public void hide() {
         if (Gdx.input.getInputProcessor() == inputMultiplexer) {
             Gdx.input.setInputProcessor(null);
         }
     }
 
     @Override
-    public void dispose () {
+    public void dispose() {
         uiStage.dispose();
         shapeRenderer.dispose();
         if (font != null) {
@@ -843,13 +946,13 @@ public class GameScreen implements Screen, InputProcessor {
         }
     }
 
-    public void beginIntroSlide () {
+    public void beginIntroSlide() {
         cameraState = CameraState.INTRO;
         snapCameraTo(CameraAnchor.RIGHT);
         startTransition(CameraAnchor.CENTER, INTRO_DURATION);
     }
 
-    public void beginOutroSlide () {
+    public void beginOutroSlide() {
         if (cameraState == CameraState.OUTRO || (cameraTransitionActive && targetAnchor == CameraAnchor.LEFT)) {
             return;
         }
@@ -857,7 +960,7 @@ public class GameScreen implements Screen, InputProcessor {
         startTransition(CameraAnchor.LEFT, OUTRO_DURATION);
     }
 
-    private void startTransition (CameraAnchor anchor, float duration) {
+    private void startTransition(CameraAnchor anchor, float duration) {
         targetAnchor = anchor;
         transitionStartX = worldCamera.position.x;
         transitionTargetX = anchor.centerX;
@@ -866,14 +969,14 @@ public class GameScreen implements Screen, InputProcessor {
         cameraTransitionActive = true;
     }
 
-    private void snapCameraTo (CameraAnchor anchor) {
+    private void snapCameraTo(CameraAnchor anchor) {
         worldCamera.position.set(anchor.centerX, MAP_HEIGHT / 2f, 0f);
         clampCameraX();
         worldCamera.update();
         currentAnchor = anchor;
     }
 
-    private void updateCamera (float delta) {
+    private void updateCamera(float delta) {
         if (cameraTransitionActive) {
             transitionTimer = Math.min(transitionTimer + delta, transitionDuration);
             float progress = transitionTimer / transitionDuration;
@@ -890,7 +993,7 @@ public class GameScreen implements Screen, InputProcessor {
         worldCamera.update();
     }
 
-    private void clampCameraX () {
+    private void clampCameraX() {
         float minX = VIEW_WIDTH / 2f;
         float maxX = MAP_WIDTH - VIEW_WIDTH / 2f;
         worldCamera.position.x = MathUtils.clamp(worldCamera.position.x, minX, maxX);
@@ -899,7 +1002,7 @@ public class GameScreen implements Screen, InputProcessor {
     /**
      * 初始化 5x9 的格子坐标，用于种植植物的地图网格。
      */
-    private void initGrid () {
+    private void initGrid() {
         if (Gdx.app != null) {
             Gdx.app.debug(TAG, "Initializing grid");
         }
@@ -913,13 +1016,13 @@ public class GameScreen implements Screen, InputProcessor {
                 grid[row][col] = new Rectangle(x, y, CELL_WIDTH, CELL_HEIGHT);
                 if (row == 0 && col < 3 && Gdx.app != null) {
                     Gdx.app.debug(TAG, String.format("grid[%d][%d]: x=%.2f-%.2f, y=%.2f-%.2f",
-                        row, col, x, x + CELL_WIDTH, y, y + CELL_HEIGHT));
+                            row, col, x, x + CELL_WIDTH, y, y + CELL_HEIGHT));
                 }
             }
         }
     }
 
-    private void initLawnMowers (TextureRegion mowerRegion) {
+    private void initLawnMowers(TextureRegion mowerRegion) {
         lawnMowers.clear();
         float textureWidth = mowerRegion != null ? mowerRegion.getRegionWidth() : 70f;
         float textureHeight = mowerRegion != null ? mowerRegion.getRegionHeight() : 60f;
@@ -938,8 +1041,20 @@ public class GameScreen implements Screen, InputProcessor {
     }
 
     @Override
-    public boolean keyDown (int keycode) {
+    public boolean keyDown(int keycode) {
         if (keycode == Input.Keys.F1) {
+            addSun(500);
+            showToast("获得 500 阳光!");
+            return true;
+        }
+        if (keycode == Input.Keys.F2) {
+            for (SeedCard card : seedCards) {
+                card.cooldownTimer = 0f;
+            }
+            showToast("冷却已重置!");
+            return true;
+        }
+        if (keycode == Input.Keys.F3) {
             debugOverlayEnabled = !debugOverlayEnabled;
             if (Gdx.app != null) {
                 Gdx.app.log(TAG, "Debug overlay " + (debugOverlayEnabled ? "enabled" : "disabled"));
@@ -955,17 +1070,17 @@ public class GameScreen implements Screen, InputProcessor {
     }
 
     @Override
-    public boolean keyUp (int keycode) {
+    public boolean keyUp(int keycode) {
         return false;
     }
 
     @Override
-    public boolean keyTyped (char character) {
+    public boolean keyTyped(char character) {
         return false;
     }
 
     @Override
-    public boolean touchDown (int screenX, int screenY, int pointer, int button) {
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         // 将屏幕坐标转换为世界坐标
         // 使用 viewport.unproject 而不是 camera.unproject，以正确处理视口偏移和缩放
         worldTouch.set(screenX, screenY, 0f);
@@ -1023,6 +1138,14 @@ public class GameScreen implements Screen, InputProcessor {
             } else {
                 selectedSeedCard = null;
                 shovel.setSelected(true);
+            }
+            return true;
+        }
+
+        // Check Exit Button
+        if (exitButtonRect.contains(uiTouch.x, uiTouch.y)) {
+            if (game != null) {
+                game.setScreen(new HomeScreen(game)); // Return to Home
             }
             return true;
         }
@@ -1090,7 +1213,8 @@ public class GameScreen implements Screen, InputProcessor {
             }
 
             // If clicked elsewhere, maybe cancel? Or keep selected?
-            // Usually in PvZ, right click cancels, left click elsewhere does nothing or cancels.
+            // Usually in PvZ, right click cancels, left click elsewhere does nothing or
+            // cancels.
             // Let's keep it selected unless right click.
         }
 
@@ -1098,27 +1222,27 @@ public class GameScreen implements Screen, InputProcessor {
     }
 
     @Override
-    public boolean touchUp (int screenX, int screenY, int pointer, int button) {
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         return false;
     }
 
     @Override
-    public boolean touchCancelled (int screenX, int screenY, int pointer, int button) {
+    public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
         return false;
     }
 
     @Override
-    public boolean touchDragged (int screenX, int screenY, int pointer) {
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
         return false;
     }
 
     @Override
-    public boolean mouseMoved (int screenX, int screenY) {
+    public boolean mouseMoved(int screenX, int screenY) {
         return false;
     }
 
     @Override
-    public boolean scrolled (float amountX, float amountY) {
+    public boolean scrolled(float amountX, float amountY) {
         return false;
     }
 
@@ -1129,7 +1253,7 @@ public class GameScreen implements Screen, InputProcessor {
 
         private final float centerX;
 
-        CameraAnchor (float centerX) {
+        CameraAnchor(float centerX) {
             this.centerX = centerX;
         }
     }
@@ -1142,7 +1266,7 @@ public class GameScreen implements Screen, InputProcessor {
         int row = -1;
         int col = -1;
 
-        void reset () {
+        void reset() {
             drawX = -9999f;
             drawY = -9999f;
             snapped = false;
@@ -1160,7 +1284,7 @@ public class GameScreen implements Screen, InputProcessor {
         float duration = 0.7f; // 飞行时间
         int reward;
 
-        public FlyingSun (Sun sun, float startX, float startY, float targetX, float targetY, int reward) {
+        public FlyingSun(Sun sun, float startX, float startY, float targetX, float targetY, int reward) {
             this.sun = sun;
             this.startX = startX;
             this.startY = startY;
@@ -1187,11 +1311,11 @@ public class GameScreen implements Screen, InputProcessor {
         private float iconWidth;
         private float iconHeight;
 
-        ShovelTool (TextureRegion region) {
+        ShovelTool(TextureRegion region) {
             this.region = region;
         }
 
-        void setBounds (float x, float y, float width, float height) {
+        void setBounds(float x, float y, float width, float height) {
             this.x = x;
             this.y = y;
             this.width = width;
@@ -1199,7 +1323,7 @@ public class GameScreen implements Screen, InputProcessor {
             recalcIconSize();
         }
 
-        void draw (SpriteBatch batch) {
+        void draw(SpriteBatch batch) {
             if (region == null || selected || iconWidth <= 0f || iconHeight <= 0f) {
                 return;
             }
@@ -1208,7 +1332,7 @@ public class GameScreen implements Screen, InputProcessor {
             batch.draw(region, drawX, drawY, iconWidth, iconHeight);
         }
 
-        void drawGhost (SpriteBatch batch, float centerX, float centerY) {
+        void drawGhost(SpriteBatch batch, float centerX, float centerY) {
             if (region == null) {
                 return;
             }
@@ -1227,39 +1351,39 @@ public class GameScreen implements Screen, InputProcessor {
             batch.setColor(oldR, oldG, oldB, oldA);
         }
 
-        boolean contains (float px, float py) {
+        boolean contains(float px, float py) {
             return px >= x && px <= x + width && py >= y && py <= y + height;
         }
 
-        boolean isSelected () {
+        boolean isSelected() {
             return selected;
         }
 
-        void setSelected (boolean selected) {
+        void setSelected(boolean selected) {
             this.selected = selected;
         }
 
-        float getX () {
+        float getX() {
             return x;
         }
 
-        float getY () {
+        float getY() {
             return y;
         }
 
-        float getWidth () {
+        float getWidth() {
             return width;
         }
 
-        float getHeight () {
+        float getHeight() {
             return height;
         }
 
-        boolean hasTexture () {
+        boolean hasTexture() {
             return region != null;
         }
 
-        private void recalcIconSize () {
+        private void recalcIconSize() {
             if (region == null || width <= 0f || height <= 0f) {
                 iconWidth = 0f;
                 iconHeight = 0f;
@@ -1285,37 +1409,192 @@ public class GameScreen implements Screen, InputProcessor {
         }
     }
 
-    private class ZombieSpawner {
-        private static final float BUCKETHEAD_CHANCE = 0.15f;
-        private static final float CONEHEAD_CHANCE = 0.35f;
-        private float spawnTimer;
-        private float nextSpawnTime = 5f;
+    private void updateStatus(String text) {
+        this.statusText = text;
+    }
 
-        void update (float delta) {
-            spawnTimer += delta;
-            if (spawnTimer >= nextSpawnTime) {
-                spawnTimer = 0f;
-                spawnZombie();
-                nextSpawnTime = MathUtils.random(4f, 7f);
+    private void showToast(String text) {
+        this.toastText = text;
+        this.toastTimer = 2.0f; // Show for 2 seconds
+    }
+
+    private class LevelManager {
+        private final List<Wave> waves = new ArrayList<>();
+        private int currentWaveIndex = 0;
+        private float waveTimer = 0f; // Timer for current wave events
+        private float spawnTimer = 0f;
+        private int zombiesSpawnedInWave = 0;
+        private boolean levelComplete = false;
+
+        private int totalZombiesInLevel = 0;
+        private int totalZombiesSpawned = 0;
+
+        LevelManager() {
+            initLevel1();
+        }
+
+        private void initLevel1() {
+            waves.clear();
+            // Wave 1: Fast Start
+            Wave w1 = new Wave(5f, 10f); // 5s wait to start, 10s interval
+            w1.addZombies(ZombieType.NORMAL, 2);
+            waves.add(w1);
+
+            // Wave 2: Coneheads
+            Wave w2 = new Wave(10f, 8f); // 10s wait, 8s interval
+            w2.addZombies(ZombieType.NORMAL, 3);
+            w2.addZombies(ZombieType.CONEHEAD, 1);
+            waves.add(w2);
+
+            // Wave 3: More
+            Wave w3 = new Wave(12f, 6f);
+            w3.addZombies(ZombieType.NORMAL, 3);
+            w3.addZombies(ZombieType.CONEHEAD, 2);
+            waves.add(w3);
+
+            // Wave 4: Bucketheads
+            Wave w4 = new Wave(15f, 5f);
+            w4.addZombies(ZombieType.NORMAL, 2);
+            w4.addZombies(ZombieType.CONEHEAD, 2);
+            w4.addZombies(ZombieType.BUCKETHEAD, 1);
+            waves.add(w4);
+
+            // Wave 5: Huge Wave (Final) - Faster
+            Wave w5 = new Wave(15f, 1.5f);
+            w5.isHugeWave = true;
+            w5.addZombies(ZombieType.NORMAL, 6);
+            w5.addZombies(ZombieType.CONEHEAD, 3);
+            w5.addZombies(ZombieType.BUCKETHEAD, 2);
+            waves.add(w5);
+
+            calculateTotalZombies();
+            updateStatus("关卡开始!");
+        }
+
+        private void calculateTotalZombies() {
+            totalZombiesInLevel = 0;
+            for (Wave w : waves) {
+                totalZombiesInLevel += w.zombies.size();
             }
         }
 
-        private void spawnZombie () {
+        void update(float delta) {
+            if (levelComplete || currentWaveIndex >= waves.size())
+                return;
+
+            Wave currentWave = waves.get(currentWaveIndex);
+
+            // Wave Start Delay Logic
+            if (waveTimer < currentWave.startDelay) {
+                waveTimer += delta;
+                // Check if we just started this delay phase (hacky check: slightly > 0 and <
+                // delta*2 ?)
+                // Better: Trigger "Wave Approaching" msg?
+                return;
+            }
+
+            // Trigger Notification at start of spawning phase
+            if (spawnTimer == 0f && zombiesSpawnedInWave == 0) {
+                if (currentWave.isHugeWave) {
+                    updateStatus("一大波僵尸正在接近!");
+                    showToast("一大波僵尸正在接近!"); // Also show as toast for emphasis
+                } else {
+                    updateStatus("第 " + (currentWaveIndex + 1) + " 波僵尸");
+                }
+            }
+
+            // Spawning Logic
+            spawnTimer += delta;
+            if (spawnTimer >= currentWave.spawnInterval) {
+                spawnTimer = 0f;
+
+                if (zombiesSpawnedInWave < currentWave.zombies.size()) {
+                    ZombieType type = currentWave.zombies.get(zombiesSpawnedInWave);
+                    spawnZombie(type);
+                    zombiesSpawnedInWave++;
+                    totalZombiesSpawned++;
+                } else {
+                    // Wave Complete, prepare for next
+                    currentWaveIndex++;
+                    zombiesSpawnedInWave = 0;
+                    waveTimer = 0f;
+                    spawnTimer = 0f; // Reset for next wave
+
+                    if (currentWaveIndex >= waves.size()) {
+                        levelComplete = true;
+                        updateStatus("关卡完成!");
+                        showToast("关卡完成!");
+                        if (Gdx.app != null)
+                            Gdx.app.log(TAG, "Level Spawning Complete!");
+                    } else {
+                        if (Gdx.app != null)
+                            Gdx.app.log(TAG, "Wave " + currentWaveIndex + " Complete. Starting Delay...");
+                    }
+                }
+            }
+        }
+
+        private void spawnZombie(ZombieType type) {
             int row = MathUtils.random(0, grid.length - 1);
+            // Ensure we don't spawn exactly on top if possible, but for now random row is
+            // fine
+            // Maybe try to find a row with fewer zombies? (Optimization for later)
+
             Rectangle cell = grid[row][grid[row].length - 1];
             float spawnY = cell.y;
             float spawnX = MAP_WIDTH - 120f;
+
             BaseZombie zombie;
-            float roll = MathUtils.random();
-            if (roll < BUCKETHEAD_CHANCE) {
-                zombie = new BucketheadZombie(GameScreen.this, spawnX, spawnY, row);
-            } else if (roll < BUCKETHEAD_CHANCE + CONEHEAD_CHANCE) {
-                zombie = new ConeheadZombie(GameScreen.this, spawnX, spawnY, row);
-            } else {
-                zombie = new NormalZombie(GameScreen.this, spawnX, spawnY, row);
+            switch (type) {
+                case BUCKETHEAD:
+                    zombie = new BucketheadZombie(GameScreen.this, spawnX, spawnY, row);
+                    break;
+                case CONEHEAD:
+                    zombie = new ConeheadZombie(GameScreen.this, spawnX, spawnY, row);
+                    break;
+                case NORMAL:
+                default:
+                    zombie = new NormalZombie(GameScreen.this, spawnX, spawnY, row);
+                    break;
             }
             addZombie(zombie);
+            if (Gdx.app != null)
+                Gdx.app.debug(TAG, "Spawned " + type + " at row " + row);
         }
+
+        public float getProgress() {
+            if (totalZombiesInLevel == 0)
+                return 0f;
+            return MathUtils.clamp((float) totalZombiesSpawned / totalZombiesInLevel, 0f, 1f);
+        }
+    }
+
+    private class Wave {
+        float startDelay; // Time to wait before this wave starts (or after previous wave ends)
+        float spawnInterval;
+        boolean isHugeWave;
+        List<ZombieType> zombies = new ArrayList<>();
+
+        Wave(float startDelay, float spawnInterval) {
+            this.startDelay = startDelay;
+            this.spawnInterval = spawnInterval;
+        }
+
+        void addZombies(ZombieType type, int count) {
+            for (int i = 0; i < count; i++) {
+                zombies.add(type);
+            }
+            // Shuffle for randomness within the wave? Or kept ordered?
+            // Let's shuffle them so we don't get 5 Normals then 1 Conehead strictly, but
+            // mixed.
+            Collections.shuffle(zombies);
+        }
+    }
+
+    private enum ZombieType {
+        NORMAL,
+        CONEHEAD,
+        BUCKETHEAD
     }
 
     private static class SeedCard {
@@ -1329,7 +1608,8 @@ public class GameScreen implements Screen, InputProcessor {
         PlantFactory plantFactory;
         final float offsetX;
 
-        public SeedCard (TextureRegion region, TextureRegion ghostRegion, int cost, float cooldownMax, float offsetX, String plantName, PlantFactory plantFactory) {
+        public SeedCard(TextureRegion region, TextureRegion ghostRegion, int cost, float cooldownMax, float offsetX,
+                String plantName, PlantFactory plantFactory) {
             this.region = region;
             this.ghostRegion = ghostRegion;
             this.cost = cost;
@@ -1339,44 +1619,46 @@ public class GameScreen implements Screen, InputProcessor {
             this.plantFactory = plantFactory;
         }
 
-        public void update (float delta) {
+        public void update(float delta) {
             if (cooldownTimer > 0) {
                 cooldownTimer -= delta;
-                if (cooldownTimer < 0) cooldownTimer = 0;
+                if (cooldownTimer < 0)
+                    cooldownTimer = 0;
             }
         }
 
-        public void triggerCooldown () {
+        public void triggerCooldown() {
             cooldownTimer = cooldownMax;
         }
 
-        public void setBounds (float x, float y, float width, float height) {
+        public void setBounds(float x, float y, float width, float height) {
             this.x = x;
             this.y = y;
             this.width = width;
             this.height = height;
         }
 
-        public boolean contains (float x, float y) {
+        public boolean contains(float x, float y) {
             return x >= this.x && x <= this.x + width && y >= this.y && y <= this.y + height;
         }
 
-        public boolean isSelectable (int currentSun) {
+        public boolean isSelectable(int currentSun) {
             return currentSun >= cost && cooldownTimer <= 0f;
         }
 
-        public TextureRegion getGhostRegion () {
+        public TextureRegion getGhostRegion() {
             return ghostRegion;
         }
 
-        public BasePlant createPlant (GameScreen screen, Rectangle cell, int row, int col) {
-            if (plantFactory == null) return null;
+        public BasePlant createPlant(GameScreen screen, Rectangle cell, int row, int col) {
+            if (plantFactory == null)
+                return null;
             return plantFactory.create(screen, cell, row, col);
         }
     }
 
     @FunctionalInterface
     private interface PlantFactory {
-        BasePlant create (GameScreen screen, Rectangle cell, int row, int col);
+        BasePlant create(GameScreen screen, Rectangle cell, int row, int col);
     }
 }

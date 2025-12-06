@@ -92,7 +92,7 @@ public class AssetPaths {
     public static final String REGION_ALMANAC_BTN_UP = "almanac_btn_up";
     public static final String REGION_ALMANAC_BTN_DOWN = "almanac_btn_down";
 
-    private AssetPaths () {
+    private AssetPaths() {
         // 私有构造函数，防止实例化
     }
 }
