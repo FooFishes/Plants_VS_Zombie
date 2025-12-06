@@ -93,6 +93,7 @@ public class AlmanacScreen implements Screen {
         this.stage = new Stage(viewport, game.batch);
         // 所有图鉴中的中文文本统一使用 PvzGame.uiFont，如果为空则回退到 debugFont
         this.font = game.uiFont != null ? game.uiFont : game.debugFont;
+        this.font.getData().markupEnabled = true;
 
         initIndexPage();
     }
@@ -286,7 +287,7 @@ public class AlmanacScreen implements Screen {
         Array<TextureAtlas.AtlasRegion> frames = plantsAtlas.findRegions(card.getPlantType().getAnimationRegion());
         Animation<TextureRegion> anim = new Animation<>(0.1f, frames, Animation.PlayMode.LOOP);
         selectedPlantActor = new AlmanacAnimationActor(anim, 1.5f);
-        selectedPlantActor.setPosition(640, 383);
+        selectedPlantActor.setPosition(690 - selectedPlantActor.getWidth() / 2f, 435 - selectedPlantActor.getHeight() / 2f);
 
         // 读取 JSON 配置
         String jsonPath = card.getPlantType().getJsonPath();
@@ -306,7 +307,7 @@ public class AlmanacScreen implements Screen {
             JsonValue tips = value.get("tips");
             if (tips != null) {
                 for (JsonValue field = tips.child; field != null; field = field.next) {
-                    Label tipLabel = new Label(field.name + ": " + field.asString(), new Label.LabelStyle(font, Color.BROWN));
+                    Label tipLabel = new Label("[#8f431b]" + field.name + ": [][#cc241d]" + field.asString() + "[]", new Label.LabelStyle(font, Color.WHITE));
                     tipLabel.setWrap(true);
                     tipLabel.setWidth(plantDetailTable.getWidth());
                     plantDetailTable.add(tipLabel).width(plantDetailTable.getWidth()).padBottom(2f).row();
@@ -318,8 +319,8 @@ public class AlmanacScreen implements Screen {
             storyLabel.setWidth(plantDetailTable.getWidth());
             plantDetailTable.add(storyLabel).width(plantDetailTable.getWidth()).padTop(8f).row();
 
-            plantCostLabel.setText("花费: " + value.getString("cost"));
-            plantRechargeLabel.setText("充能: " + value.getString("recharge"));
+            plantCostLabel.setText("[#8f431b]花费: [][#cc241d]" + value.getString("cost") + "[]");
+            plantRechargeLabel.setText("[#8f431b]充能: [][#cc241d]" + value.getString("recharge") + "[]");
         } catch (Exception e) {
             Gdx.app.error("AlmanacScreen", "Failed to load plant JSON: " + jsonPath, e);
         }
@@ -399,7 +400,7 @@ public class AlmanacScreen implements Screen {
             JsonValue tips = value.get("tips");
             if (tips != null) {
                 for (JsonValue field = tips.child; field != null; field = field.next) {
-                    Label tipLabel = new Label(field.name + ": " + field.asString(), new Label.LabelStyle(font, Color.BROWN));
+                    Label tipLabel = new Label("[#8f431b]" + field.name + ": [][#cc241d]" + field.asString() + "[]", new Label.LabelStyle(font, null));
                     tipLabel.setWrap(true);
                     tipLabel.setWidth(zombieDetailTable.getWidth());
                     zombieDetailTable.add(tipLabel).width(zombieDetailTable.getWidth()).padBottom(2f).row();
