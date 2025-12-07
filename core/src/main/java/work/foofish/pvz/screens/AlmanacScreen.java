@@ -275,6 +275,7 @@ public class AlmanacScreen implements Screen {
     private void showPlantDetails(AlmanacPlantCard card) {
         if (selectedPlantCard == card) return;
 
+
         if (selectedPlantCard != null) {
             selectedPlantCard.setSelected(false);
         }
@@ -285,8 +286,9 @@ public class AlmanacScreen implements Screen {
         TextureAtlas plantsAtlas = assets.getAtlas(AssetPaths.PLANTS_ATLAS);
         Array<TextureAtlas.AtlasRegion> frames = plantsAtlas.findRegions(card.getPlantType().getAnimationRegion());
         Animation<TextureRegion> anim = new Animation<>(0.1f, frames, Animation.PlayMode.LOOP);
-        selectedPlantActor = new AlmanacAnimationActor(anim, 1.5f);
-        selectedPlantActor.setPosition(640, 383);
+        float baseScale = 1.5f;
+        selectedPlantActor = new AlmanacAnimationActor(anim, baseScale);
+        selectedPlantActor.setPosition(635, 383);
 
         // 读取 JSON 配置
         String jsonPath = card.getPlantType().getJsonPath();
@@ -294,6 +296,11 @@ public class AlmanacScreen implements Screen {
             String jsonContent = Gdx.files.internal(jsonPath).readString();
             JsonReader reader = new JsonReader();
             JsonValue value = reader.parse(jsonContent);
+
+            float scaleMultiplier = value.getFloat("specialScale", 1.0f);
+            float finalScale=scaleMultiplier*baseScale;
+            selectedPlantActor.setScale(finalScale);
+
 
             plantNameLabel.setText(value.getString("name"));
 
